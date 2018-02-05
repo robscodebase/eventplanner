@@ -8,11 +8,12 @@ RUN curl -SLO "http://nodejs.org/dist/v$NODE_VERSION/node-v$NODE_VERSION-linux-x
 ENV PATH $PATH:/nodejs/bin
 
 RUN go get github.com/gorilla/mux && \
+    go get github.com/gorilla/handlers && \
     go get golang.org/x/net/context && \
     apt-get install -y vim
 
 COPY . /go/src/event-planner
-WORKDIR /go/src/event-planner/src/server
+WORKDIR /go/src/event-planner
 RUN ["./build.sh"]
 COPY ./docker-entrypoint.sh /
 ENTRYPOINT ["/docker-entrypoint.sh"]

@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html>
+<head>
+<title>Event Planner - Schedule and View Your Events</title>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.3.2/css/bootstrap.min.css">
+</head>
+<body>
+<div class="navbar navbar-default">
+  <div class="container">
+    <div class="navbar-header">
+      <div class="navbar-brand">Event Planner</div>
+    </div>
+
+    <ul class="nav navbar-nav">
+      <li><a href="/events">events</a></li>
+      {{if .Login}}
+        <li><a href="/events/my-events">My Events</a></li>
+      {{end}}
+    </ul>
+
+    <!-- [START auth] -->
+    {{if .Login}}
+      {{if .UserData}}
+      <form method="post" action="{{.LogoutURL}}" class="navbar-form navbar-right">
+        <button class="btn btn-default">Log out</button>
+      </form>
+      <div class="navbar-text navbar-right">
+        <span>{{.UserData.UserName}}</span>
+      </div>
+      {{else}}
+      <div class="navbar-text navbar-right">
+        <a href="/login">Log in</a>
+      </div>
+      {{end}}
+    {{end}}
+    <!-- [END auth] -->
+  </div>
+</div>
+<div class="container">
+  {{template "body" .Input}}
+</div>
+</body>
+</html>

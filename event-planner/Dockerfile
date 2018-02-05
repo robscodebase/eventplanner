@@ -15,6 +15,6 @@ RUN go get github.com/gorilla/mux && \
 COPY . /go/src/event-planner
 WORKDIR /go/src/event-planner
 RUN ["./build.sh"]
-COPY ./docker-entrypoint.sh /
-ENTRYPOINT ["/docker-entrypoint.sh"]
-
+COPY ./entrypoint.sh /
+ENTRYPOINT ["/entrypoint.sh"]
+EXPOSE 8080

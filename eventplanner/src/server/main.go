@@ -9,12 +9,22 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"path/filepath"
 )
 
 var Login bool
+var filePathBase string
 
 func main() {
 	runHandlers()
+}
+
+func init() {
+	workingDirectory, err := os.Getwd()
+	if err != nil {
+		log.Fatalf("can't open working directory. err %v:", err)
+	}
+	filePathBase = filepath.Base(workingDirectory)
 }
 
 var (
@@ -65,7 +75,7 @@ type eventPlannerTemplate struct {
 
 func compileTemplate(templateName string) *eventPlannerTemplate {
 	// Add the main template file.
-	main := template.Must(template.ParseFiles("/go/src/event-planner/src/server/templates/main.html"))
+	main := template.Must(template.ParseFiles(filePathBase + "templates/main.html"))
 
 	// Add the header.
 	header := readFile("header.html")
@@ -82,7 +92,7 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 }
 
 func readFile(fileName string) []byte {
-	template, err := ioutil.ReadFile("/go/src/event-planner/src/server/templates/" + fileName)
+	template, err := ioutil.ReadFile(filePathBase + "templates/" + fileName)
 	if err != nil {
 		panic(fmt.Errorf("compileTemplate() could not read footer: %v", err))
 	}

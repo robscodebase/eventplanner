@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
    <head>
@@ -7,6 +5,8 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width, initial-scale=1">
       <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
+      <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+      <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
    </head>
    <body class="container bg-inverse">
       <nav class="navbar bg-inverse d-none d-sm-block">
@@ -33,7 +33,7 @@
             </nav>
          </div>
          <!-- column end -->
-         <div class="col-md-2">
+         <div class="col-md-10">
              <div class="card bg-inverse text-light card-outline-primary">
                  <div class="container">
              <form>
@@ -43,33 +43,32 @@
                </div>
                <!-- form-group end -->
                <div class="row">
-               <div class="col-6">
+               <div class="col-12 col-sm-6">
                <div class="form-group bg-inverse form-group-inline">
-                  <label for="formGroupExampleInput" class="text-white">Date</label>
-                  <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input">
+                  <label for="start-time-picker" class="text-white">Start</label>
+                  <input type="date" class="form-control" id="start-time-picker">
                 </div>
                 <!-- form-group end -->
               </div>
                <!-- column end -->
-               <div class="col-6">
+               <div class="col-12 col-sm-6">
                <div class="form-group bg-inverse form-group-inline">
-                  <label for="formGroupExampleInput" class="text-white">Time</label>
-                  <input type="text" class="form-control" id="formGroupExampleInput" placeholder="Example input">
+                  <label for="end-time-picker" class="text-white">End</label>
+                  <input type="text" class="form-control" id="end-time-picker">
                </div>
              </div>
                <!-- column end -->
                </div>
                <!-- row end -->
                  <div class="form-group">
-                         <label for="exampleFormControlTextarea1" class="text-white">Description</label>
-                             <textarea class="form-control" id="exampleFormControlTextarea1" rows="3"></textarea>
+                         <label for="event-description-text-area" class="text-white">Description</label>
+                             <textarea class="form-control" id="event-description-text-area" rows="3"></textarea>
                                </div>
                <!-- form-group end -->
             </form>
             <!-- form end -->
           </div>
           <!-- container end -->
-
          </div>
          <!-- card end -->
          </div>
@@ -78,6 +77,8 @@
          <!-- row end -->
        </div>
        <!-- container end -->
+       <script>flatpickr("#start-time-picker", {enableTime: true});</script>
+       <script>flatpickr("#end-time-picker", {enableTime: true});</script>
       <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>
       <script src="https://cdnjs.cloudflare.com/ajax/libs/tether/1.4.0/js/tether.min.js" integrity="sha384-DztdAPBWPRXSA/3eYEEUWrWCy7G5KFbe8fFjk5JAIxUYHKkDx6Qin1DkWx51bBrb" crossorigin="anonymous"></script>
       <script src="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/js/bootstrap.min.js" integrity="sha384-vBWWzlZJ8ea9aCX4pEW3rVHjgjt7zpkNpZk+02D9phzyeVkE+jo0ieGizqPLForn" crossorigin="anonymous"></script>

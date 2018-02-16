@@ -1,5 +1,3 @@
-
-
 <!DOCTYPE html>
 <html>
   <head>
@@ -9,10 +7,10 @@
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   </head>
   <body class="container bg-inverse">
-    <nav class="navbar bg-inverse d-none d-sm-block">
+    <nav class="navbar bg-inverse">
       <div class="row">
         <div class="col-3">
-          <a class="navbar-link text-primary" href="#">Planner</a>
+          <h3><a class="navbar-link text-primary" href="#">Register</a></h3>
         </div>
         <!-- column end -->
       </div>
@@ -20,12 +18,12 @@
     </nav>
     <div class="container">
       <div class="row">
-        <div class="col-md-10">
+        <div class="col-12 col-sm-10 col-md-8">
           <div class="card bg-inverse text-light card-outline-primary">
             <div class="container">
               <form>
                 <div class="row">
-                  <div class="col-12 col-sm-6">
+                  <div class="col">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="first-name" class="text-white">First</label>
                       <input type="text" class="form-control" id="first-name">
@@ -33,7 +31,10 @@
                     <!-- form-group end -->
                   </div>
                   <!-- column end -->
-                  <div class="col-12 col-sm-6">
+                </div>
+                <!-- row end -->
+                <div class="row">
+                  <div class="col">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="end-time-picker" class="text-white">Last</label>
                       <input type="text" class="form-control" id="end-time-picker">
@@ -43,23 +44,32 @@
                   <!-- column end -->
                 </div>
                 <!-- row end -->
-            </div>
-            <!-- container end -->
-            <div class="container">
-            <div class="row">
-            <div class="col-12">
-            <div class="form-group bg-inverse">
-            <label for="email" class="text-white">email</label>
-            <input type="email" class="form-control" id="email">
-            <small id="emailHelp" class="form-text text-muted">Your information will not be shared.</small>
-            </div>
-            <!-- form-group end -->
-            </div>
-            <!-- column end -->
-            </div>
-            <!-- row end -->
-            </div>
-            <!-- container end -->
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group bg-inverse">
+                      <label for="email" class="text-white">Email</label>
+                      <input type="email" class="form-control" id="email">
+                      <small id="emailHelp" class="form-text text-muted">Your information will not be shared.</small>
+                    </div>
+                    <!-- form-group end -->
+                  </div>
+                  <!-- column end -->
+                </div>
+                <!-- row end -->
+                <div class="row">
+                  <div class="col">
+                    <div class="form-group bg-inverse">
+                      <label for="email" class="text-white">Password</label>
+                      <input type="password" class="form-control" id="password">
+                      <small id="password" class="form-text text-muted">Any password is acceptable.</small>
+                    </div>
+                    <!-- form-group end -->
+                  </div>
+                  <!-- column end -->
+                </div>
+                <!-- row end -->
+              </div>
+              <!-- container end -->
             </form>
             <!-- form end -->
           </div>
@@ -68,6 +78,13 @@
         <!-- column end -->
       </div>
       <!-- row end -->
+      <div class="row">
+        <div class="col-6 align-self-start" style="padding-top:10px;">
+            <button type="submit" class="btn btn-primary">Submit</button>
+        </div>
+        <!-- column end -->
+    </div>
+    <!-- row end -->
     </div>
     <!-- container end -->
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>

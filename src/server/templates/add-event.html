@@ -11,24 +11,22 @@
   <body class="container bg-inverse">
     <nav class="navbar bg-inverse d-none d-sm-block">
       <div class="row">
-        <div class="col-3">
-          <a class="navbar-link text-primary" href="events">Planner</a>
+        <div class="col-5 offset-md-2 mt-1">
+          <h3 class="navbar-text text-white">Add Event</h3>
         </div>
-        <div class="col">
-          <a class="navbar-link text-primary" style="float: right" href="/logout">Log Out</a>
+        <div class="col mt-3">
+          <a class="navbar-link text-primary float-right" href="/logout">Log Out</a>
         </div>
         <!-- column end -->
       </div>
-      <!-- row end -->
+      <!-- row  end -->
     </nav>
     <div class="container">
       <div class="row">
         <div class="col-md-2">
-          <nav class="nav flex-sm-column nav-pills">
-            <a class="nav-link text-white" href="events">Events</a>
-            <a class="nav-link active text-white" href="add-event">Add</a>
-            <a class="nav-link text-primary d-inline d-sm-none" href="/logout">Log Out</a>
-          </nav>
+          <a class="btn btn-outline-primary text-white w-100" href="events">Events</a>
+          <a class="btn active btn-outline-primary text-white w-100" href="add">Add</a>
+          <a class="btn btn-outline-primary text-danger d-sm-none w-100" href="/logout">Log Out</a>
         </div>
         <!-- column end -->
         <div class="col-md-10">
@@ -44,7 +42,7 @@
                   <div class="col-12 col-sm-6">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="start-time-picker" class="text-white">Start</label>
-                      <input type="date" class="form-control" id="start-time-picker">
+                      <input type="text" class="form-control" id="start-time-picker">
                     </div>
                     <!-- form-group end -->
                   </div>
@@ -74,16 +72,16 @@
       </div>
       <!-- row end -->
       <div class="row">
-        <div class="col-12 offset-md-2 col-sm-6" style="padding-top:10px;">
-            <button type="submit" class="btn btn-primary">Sumbit</button>
+        <div class="col-12 offset-md-2 col-sm-6 col-md-5" style="padding-top:10px;">
+          <button type="submit" class="btn btn-primary w-100">Submit</button>
         </div>
         <!-- column end -->
-        <div class="col-12 col-sm-6 col-md-4" style="padding-top:10px;">
-          <button type="submit" class="btn btn-danger float-sm-right" >Delete</button>
+        <div class="col-12 col-sm-6 col-md-5" style="padding-top:10px;">
+          <button type="submit" class="btn btn-danger float-sm-right w-100">Delete</button>
+        </div>
+        <!-- column end -->
       </div>
-      <!-- column end -->
-    </div>
-    <!-- row end -->
+      <!-- row end -->
     </div>
     <!-- container end -->
     <script>flatpickr("#start-time-picker", {enableTime: true});</script>

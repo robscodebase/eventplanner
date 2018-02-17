@@ -1,53 +1,52 @@
-
-
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Event Planner - Schedule and View Your Events</title>
+    <title>Event Planner - View Events</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
   </head>
-  <!-- top navigation bar start -->
   <body class="container bg-inverse">
     <nav class="navbar bg-inverse d-none d-sm-block">
       <div class="row">
-        <div class="col-3 ml-0">
-          <a class="navbar-link text-primary" href="#">Planner</a>
+        <div class="col-5 offset-md-2 mt-1">
+          <h3 class="navbar-text font-weight-bold text-white">View Events</h3>
         </div>
         <!-- column end -->
-        <div class="col-6">
-        </div>
-        <!-- column end -->
-        <div class="col-3">
-          <a class="navbar-link text-primary" href="#">Log Out</a>
+        <div class="col mt-3">
+          <a class="btn btn-outline-primary text-white float-right" href="/logout">Log Out</a>
         </div>
         <!-- column end -->
       </div>
       <!-- row end -->
     </nav>
-    <!-- navbar end -->
-    <!-- side navigation bar start -->
     <div class="container">
       <div class="row">
         <div class="col-md-2">
-          <nav class="nav flex-sm-column nav-pills">
-            <a class="nav-link active text-white" href="#">Events</a>
-            <a class="nav-link text-white" href="#">Add</a>
-            <a class="nav-link text-primary d-inline d-sm-none" href="#">Log Out</a>
-          </nav>
+          <a class="btn btn-outline-primary active text-white w-100" href="events">Events</a>
+          <a class="btn btn-outline-primary text-white w-100" href="add">Add</a>
+          <a class="btn btn-outline-primary text-white d-block d-sm-none w-100" href="/logout">Log Out</a>
         </div>
         <!-- column end -->
         <!-- event data start -->
-        <div class="col-12 col-md-9">
+        <div class="col-12 col-md-10">
           <div class="card-deck">
             <div class="card bg-inverse card-outline-primary">
               <div class="card-block">
                 <h4 class="card-title text-primary">Event</h4>
                 <h6 class="card-subtitle mb-2 text-white">Event Time</h6>
                 <p class="card-text text-white">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-warning">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
+                <div class="row">
+                  <div class="col-12 col-sm 6">
+                    <a href="#" class="btn btn-warning w-100">Edit</a>
+                  </div>
+                  <!-- column end -->
+                  <div class="col-12 col-sm 6">
+                    <a href="#" class="btn btn-danger w-100">Delete</a>
+                  </div>
+                  <!-- column end -->
+                </div>
+                <!-- row end -->
               </div>
               <!-- card-block end -->
             </div>
@@ -57,8 +56,17 @@
                 <h4 class="card-title text-primary">Event</h4>
                 <h6 class="card-subtitle mb-2 text-white">Event Time</h6>
                 <p class="card-text text-white">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-                <a href="#" class="btn btn-warning">Edit</a>
-                <a href="#" class="btn btn-danger">Delete</a>
+                <div class="row">
+                  <div class="col-12 col-sm 6">
+                    <a href="#" class="btn btn-warning w-100">Edit</a>
+                  </div>
+                  <!-- column end -->
+                  <div class="col-12 col-sm 6">
+                    <a href="#" class="btn btn-danger w-100">Delete</a>
+                  </div>
+                  <!-- column end -->
+                </div>
+                <!-- row end -->
               </div>
               <!-- card-block end -->
             </div>

@@ -17,7 +17,7 @@ func main() {
 }
 
 var (
-	homePage = compileTemplate("home.html")
+	homePage = compileTemplate("view-events.html")
 )
 
 func runHandlers() {

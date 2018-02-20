@@ -10,4 +10,4 @@ WORKDIR /go/src/event-planner
 RUN ["./build.sh"]
 COPY ./entrypoint.sh /
 ENTRYPOINT ["/entrypoint.sh"]
-EXPOSE 8080
+EXPOSE 8081

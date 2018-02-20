@@ -23,6 +23,10 @@ type eventPlannerTemplate struct {
 }
 
 func compileTemplate(templateName string) *eventPlannerTemplate {
+	if templateName == "login" {
+		login := template.Must(template.ParseFiles(filePathBase + "templates/login.html"))
+		return &eventPlannerTemplate{login.Lookup("login.html")}
+	}
 	// Add the main template file.
 	main := template.Must(template.ParseFiles(filePathBase + "templates/main.html"))
 

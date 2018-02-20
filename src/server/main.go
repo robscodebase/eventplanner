@@ -21,6 +21,7 @@ var (
 	addEvents  = compileTemplate("view-events.html")
 	editEvents = compileTemplate("view-events.html")
 	login      = compileTemplate("view-events.html")
+	register   = compileTemplate("register.html")
 )
 
 func runHandlers() {
@@ -40,9 +41,13 @@ func runHandlers() {
 	log.Fatal(http.ListenAndServe(":8081", r))
 }
 
+func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	log.Println("main.go: main(): runHandlers(): registerHandler().")
+	return register.runTemplate(w, r, nil)
+}
 func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	log.Println("main.go: main(): runHandlers(): loginHandler().")
-	return viewEvents.runTemplate(w, r, nil)
+	return login.runTemplate(w, r, nil)
 }
 func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	log.Println("main.go: main(): runHandlers(): viewEventsHandler().")

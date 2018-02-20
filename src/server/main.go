@@ -18,9 +18,9 @@ func main() {
 
 var (
 	viewEvents = compileTemplate("view-events.html")
-	addEvents  = compileTemplate("view-events.html")
-	editEvents = compileTemplate("view-events.html")
-	login      = compileTemplate("view-events.html")
+	addEvent   = compileTemplate("add-event.html")
+	editEvent  = compileTemplate("edit-event.html")
+	login      = compileTemplate("login.html")
 	register   = compileTemplate("register.html")
 )
 
@@ -28,14 +28,22 @@ func runHandlers() {
 	log.Println("main.go: main(): runHandlers(): running handlers.")
 	r := mux.NewRouter()
 	r.Handle("/", http.RedirectHandler("/home", http.StatusFound))
+
+	r.Methods("GET").Path("/register").
+		Handler(errorCheck(registerHandler))
+
 	r.Methods("GET").Path("/login").
-		Handler(errorCheck(viewEventsHandler))
+		Handler(errorCheck(loginHandler))
+
 	r.Methods("GET").Path("/view-events").
 		Handler(errorCheck(viewEventsHandler))
-	r.Methods("GET").Path("/add-events").
-		Handler(errorCheck(viewEventsHandler))
-	r.Methods("GET").Path("/edit-events").
-		Handler(errorCheck(viewEventsHandler))
+
+	r.Methods("GET").Path("/add-event").
+		Handler(errorCheck(addEventHandler))
+
+	r.Methods("GET").Path("/edit-event").
+		Handler(errorCheck(editEventHandler))
+
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 	log.Print("Listening on port 8081")
 	log.Fatal(http.ListenAndServe(":8081", r))
@@ -53,13 +61,13 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	log.Println("main.go: main(): runHandlers(): viewEventsHandler().")
 	return viewEvents.runTemplate(w, r, nil)
 }
-func addEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	log.Println("main.go: main(): runHandlers(): addEventsHandler().")
-	return addEvents.runTemplate(w, r, nil)
+	return addEvent.runTemplate(w, r, nil)
 }
-func editEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	log.Println("main.go: main(): runHandlers(): editEventsHandler().")
-	return editEvents.runTemplate(w, r, nil)
+	return editEvent.runTemplate(w, r, nil)
 }
 
 type errorCheck func(http.ResponseWriter, *http.Request) *errorMessage

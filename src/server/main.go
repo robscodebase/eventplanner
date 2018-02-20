@@ -50,37 +50,32 @@ func runHandlers() {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): registerHandler().")
+	log.Println("main.go: main(): runHandlers(): registerHandler(): call to handler.")
 	return register.runTemplate(w, r, nil)
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): loginHandler().")
+	log.Println("main.go: main(): runHandlers(): loginHandler() call to handler.")
 	return login.runTemplate(w, r, nil)
 }
 func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): viewEventsHandler().")
-	return viewEvents.runTemplate(w, r, nil)
+	p := &PageData{PageName: "View Events"}
+	log.Println("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
+	return viewEvents.runTemplate(w, r, p)
 }
 func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): addEventsHandler().")
-	return addEvent.runTemplate(w, r, nil)
+	p := &PageData{PageName: "Add Event"}
+	log.Println("main.go: main(): runHandlers(): addEventsHandler(). call to handler")
+	return addEvent.runTemplate(w, r, p)
 }
 func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): editEventsHandler().")
-	return editEvent.runTemplate(w, r, nil)
-}
-
-type errorCheck func(http.ResponseWriter, *http.Request) *errorMessage
-
-type errorMessage struct {
-	Error   error
-	Message string
-	Code    int
+	p := &PageData{PageName: "Edit Event"}
+	log.Println("main.go: main(): runHandlers(): editEventsHandler(). call to handler")
+	return editEvent.runTemplate(w, r, p)
 }
 
 func (errCheck errorCheck) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if errcheck := errCheck(w, r); errcheck != nil {
-		log.Printf("serveHTTP error: status code: %d, message: %s, error: %#v",
+		log.Printf("main.go: serveHTTP(): error: status code: %d, message: %s, error: %#v",
 			errcheck.Code, errcheck.Message, errcheck.Error)
 		http.Error(w, errcheck.Message, errcheck.Code)
 	}
@@ -94,13 +89,9 @@ func formatError(err error, format string, v ...interface{}) *errorMessage {
 	}
 }
 
-func sessionData(r *http.Request) *UserData {
-	return &UserData{
+func sessionData(r *http.Request) *User {
+	return &User{
 		ID:       "SECURE ID",
 		UserName: "ADMIN",
 	}
-}
-
-type UserData struct {
-	ID, UserName string
 }

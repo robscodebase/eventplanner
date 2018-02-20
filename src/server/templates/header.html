@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <title>Event Planner - View Events</title>
+    <title>Event Planner - {{.PageName}}</title>
     <meta charset="utf-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/4.0.0-alpha.6/css/bootstrap.min.css" integrity="sha384-rwoIResjU2yc3z8GV/NPeZWAv56rSmLldC3R/AZzGRnGxQQKnKkoFVhFQhNUwEyJ" crossorigin="anonymous">
@@ -10,7 +10,7 @@
     <nav class="navbar bg-inverse d-none d-sm-block">
       <div class="row">
         <div class="col-5 offset-md-2 mt-1">
-          <h3 class="navbar-text font-weight-bold text-white">Page Title</h3>
+          <h3 class="navbar-text font-weight-bold text-white">{{.PageName}}</h3>
         </div>
         <!-- column end -->
         <div class="col mt-3">
@@ -23,8 +23,8 @@
     <div class="container">
       <div class="row">
         <div class="col-md-2">
-          <a class="btn btn-outline-primary active text-white w-100" href="view-events">Events</a>
-          <a class="btn btn-outline-primary text-white w-100" href="add-event">Add</a>
+          <a class="btn btn-outline-primary {{if eq .PageName "View Events"}}active{{end}} text-white w-100" href="view-events">Events</a>
+          <a class="btn btn-outline-primary {{if eq .PageName "Add Event"}}active{{end}} text-white w-100" href="add-event">Add</a>
           <a class="btn btn-outline-primary text-white d-block d-sm-none w-100" href="/logout">Log Out</a>
         </div>
         <!-- column end -->

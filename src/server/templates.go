@@ -13,7 +13,7 @@ import (
 func init() {
 	workingDirectory, err := os.Getwd()
 	if err != nil {
-		log.Fatalf("can't open working directory. err %v:", err)
+		log.Fatalf("templates.go: init(): can't open working directory. err %v:", err)
 	}
 	filePathBase = filepath.Base(workingDirectory)
 }
@@ -51,7 +51,7 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 func readFile(fileName string) []byte {
 	template, err := ioutil.ReadFile(filePathBase + "templates/" + fileName)
 	if err != nil {
-		panic(fmt.Errorf("compileTemplate() could not read footer: %v", err))
+		panic(fmt.Errorf("templates.go: readFile(): could not read file: %v: %v", fileName, err))
 	}
 	return template
 }
@@ -60,18 +60,18 @@ func (template *eventPlannerTemplate) runTemplate(w http.ResponseWriter, r *http
 	session := struct {
 		Input       interface{}
 		AuthEnabled bool
-		UserData    *UserData
+		User        *User
 	}{
 		Input:       input,
 		AuthEnabled: true,
 	}
 
 	if Login {
-		session.UserData = sessionData(r)
+		session.User = sessionData(r)
 	}
 
 	if err := template.eventPlannerTemplate.Execute(w, session); err != nil {
-		return formatError(err, "runTemplate() could not execute template: %v")
+		return formatError(err, "templates.go: runTemplate(): could not execute template: %v")
 	}
 	return nil
 }

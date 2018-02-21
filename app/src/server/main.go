@@ -3,7 +3,7 @@ package main
 import (
 	"database/sql"
 	"fmt"
-	_ "githbu.com/go-sql-driver/mysql"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
@@ -12,12 +12,16 @@ import (
 )
 
 var Login bool
-var err bool
+var err error
 var filePathBase string
-var db *sql.DB
+
+type database struct {
+	db *sql.DB
+}
 
 func main() {
-	db, err = registerDB()
+	var db database
+	err = db.registerDB()
 	if err != nil {
 		log.Println("main.go: main(): call to registerDB(): error: ", err)
 	}

@@ -4,15 +4,10 @@ import (
 	"fmt"
 	"html/template"
 	"io/ioutil"
-	//"log"
 	"net/http"
-	//"os"
-	//"path/filepath"
 )
 
-func filePath() string {
-	return "/go/src/eventplanner/src/server"
-}
+var filePath = "/go/src/eventplanner/src/server"
 
 type eventPlannerTemplate struct {
 	eventPlannerTemplate *template.Template
@@ -20,15 +15,15 @@ type eventPlannerTemplate struct {
 
 func compileTemplate(templateName string) *eventPlannerTemplate {
 	if templateName == "login.html" {
-		login := template.Must(template.ParseFiles(filePath() + "/templates/" + templateName))
+		login := template.Must(template.ParseFiles(filePath + "/templates/" + templateName))
 		return &eventPlannerTemplate{login.Lookup(templateName)}
 	}
 	if templateName == "register.html" {
-		register := template.Must(template.ParseFiles(filePath() + "/templates/" + templateName))
+		register := template.Must(template.ParseFiles(filePath + "/templates/" + templateName))
 		return &eventPlannerTemplate{register.Lookup(templateName)}
 	}
 	// Add the main template file.
-	main := template.Must(template.ParseFiles(filePath() + "/templates/main.html"))
+	main := template.Must(template.ParseFiles(filePath + "/templates/main.html"))
 
 	// Add the header.
 	header := readFile("header.html")
@@ -45,7 +40,7 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 }
 
 func readFile(fileName string) []byte {
-	template, err := ioutil.ReadFile(filePath() + "/templates/" + fileName)
+	template, err := ioutil.ReadFile(filePath + "/templates/" + fileName)
 	if err != nil {
 		panic(fmt.Errorf("templates.go: readFile(): could not read file: %v: %v", fileName, err))
 	}

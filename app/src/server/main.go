@@ -46,7 +46,7 @@ func runHandlers() {
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 	log.Print("Listening on port 8081")
-	log.Fatal(http.ListenAndServe(":8081", r))
+	log.Print(http.ListenAndServe(":8081", r))
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {

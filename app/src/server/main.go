@@ -20,10 +20,15 @@ type database struct {
 }
 
 func main() {
-	var db database
+	var db *database
 	err = db.registerDB()
 	if err != nil {
 		log.Println("main.go: main(): call to registerDB(): error: ", err)
+	}
+	sLog(fmt.Sprintf("main.go: main(): after db.register(): db.db = %v", db.db))
+	err = createDB(db.db)
+	if err != nil {
+		log.Println("main.go: main(): call to createDB(): error: ", err)
 	}
 	runHandlers()
 }

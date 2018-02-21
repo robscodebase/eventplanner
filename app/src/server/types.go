@@ -2,7 +2,6 @@ package main
 
 import (
 	"net/http"
-	"time"
 )
 
 type PageData struct {
@@ -12,10 +11,12 @@ type PageData struct {
 }
 
 type Event struct {
+	ID          int64
 	Name        string
-	StartTime   time.Time
-	EndTime     time.Time
+	StartTime   string
+	EndTime     string
 	Description string
+	CreatedBy   string
 }
 
 type User struct {

@@ -1,7 +1,9 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
+	_ "githbu.com/go-sql-driver/mysql"
 	"github.com/gorilla/handlers"
 	"github.com/gorilla/mux"
 	"log"
@@ -10,9 +12,15 @@ import (
 )
 
 var Login bool
+var err bool
 var filePathBase string
+var db *sql.DB
 
 func main() {
+	db, err = registerDB()
+	if err != nil {
+		log.Println("main.go: main(): call to registerDB(): error: ", err)
+	}
 	runHandlers()
 }
 
@@ -25,7 +33,7 @@ var (
 )
 
 func runHandlers() {
-	log.Println("main.go: main(): runHandlers(): running handlers.")
+	sLog("main.go: main(): runHandlers(): running handlers.")
 	r := mux.NewRouter()
 	r.Handle("/", http.RedirectHandler("/home", http.StatusFound))
 
@@ -50,32 +58,32 @@ func runHandlers() {
 }
 
 func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): registerHandler(): call to handler.")
+	sLog("main.go: main(): runHandlers(): registerHandler(): call to handler.")
 	return register.runTemplate(w, r, nil)
 }
 func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	log.Println("main.go: main(): runHandlers(): loginHandler() call to handler.")
+	sLog("main.go: main(): runHandlers(): loginHandler() call to handler.")
 	return login.runTemplate(w, r, nil)
 }
 func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	p := &PageData{PageName: "View Events"}
-	log.Println("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
+	sLog("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
 	return viewEvents.runTemplate(w, r, p)
 }
 func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	p := &PageData{PageName: "Add Event"}
-	log.Println("main.go: main(): runHandlers(): addEventsHandler(). call to handler")
+	sLog("main.go: main(): runHandlers(): addEventsHandler(). call to handler")
 	return addEvent.runTemplate(w, r, p)
 }
 func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	p := &PageData{PageName: "Edit Event"}
-	log.Println("main.go: main(): runHandlers(): editEventsHandler(). call to handler")
+	sLog("main.go: main(): runHandlers(): editEventsHandler(). call to handler")
 	return editEvent.runTemplate(w, r, p)
 }
 
 func (errCheck errorCheck) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if errcheck := errCheck(w, r); errcheck != nil {
-		log.Printf("main.go: serveHTTP(): error: status code: %d, message: %s, error: %#v",
+		log.Printf("main.go: ServeHTTP(): error: status code: %d, message: %s, error: %#v",
 			errcheck.Code, errcheck.Message, errcheck.Error)
 		http.Error(w, errcheck.Message, errcheck.Code)
 	}

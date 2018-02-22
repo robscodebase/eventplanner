@@ -14,6 +14,7 @@ import (
 var Login bool
 var err error
 var filePathBase string
+var dbLogIn = "root:insecure@(mysql:3306)/mysql"
 
 var db *sql.DB
 

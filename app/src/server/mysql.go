@@ -5,6 +5,7 @@ import (
 	"database/sql/driver"
 	"fmt"
 	"github.com/go-sql-driver/mysql"
+	"log"
 )
 
 func registerDB() (*sql.DB, error) {
@@ -73,4 +74,16 @@ func createDB(db *sql.DB) error {
 		}
 	}
 	return nil
+}
+
+func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
+	dbLog(fmt.Sprintf("mysql.go: viewDBEvents() var db: %v", db))
+	rows, err := db.Query(`SELECT * FROM events`)
+	if err != nil {
+		log.Println(err)
+		//return nil, fmt.Errorf("mysql.go: viewEvents(): rows = %v: error: %v", rows, err)
+	}
+	defer rows.Close()
+
+	dbLog(fmt.Sprintf("mysql.go: viewDBEvents() var rows: %v", rows))
 }

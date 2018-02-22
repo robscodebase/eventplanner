@@ -21,13 +21,14 @@ var db *sql.DB
 func main() {
 	db, err = registerDB()
 	if err != nil {
-		log.Println("main.go: main(): call to registerDB(): error: ", err)
+		log.Printf("main.go: main(): call to registerDB(): error: ", err)
 	}
 	sLog(fmt.Sprintf("main.go: main(): after db.register(): db = %v", db))
 	err = createDB(db)
 	if err != nil {
-		log.Println("main.go: main(): call to createDB(): error: ", err)
+		log.Printf("main.go: main(): call to createDB(): error: ", err)
 	}
+	viewDBEvents(db)
 	runHandlers()
 }
 

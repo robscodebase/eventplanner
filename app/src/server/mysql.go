@@ -6,15 +6,14 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 )
 
-func (db *database) registerDB() error {
-	dbLog(fmt.Sprintf("mysql.go: registerDB():"))
-	db, err = sql.Open("mysql", "mysqldb:insecure@(127.17.0.2:3306)/")
-	db.db = &sql.DB{db}
-	dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open: %v", db.db))
+func registerDB() (*sql.DB, error) {
+	dbLog(fmt.Sprintf("mysql.go: registerDB()"))
+	db, err = sql.Open("mysql", "root:insecure@(mysql:3306)/mysql")
+	dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open: %v", db))
 	if err != nil {
-		return fmt.Errorf("mysql.go: registerDB(): sqlOpen err: %v", err)
+		return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
 	}
-	return nil
+	return db, nil
 }
 
 var tableCreator = []string{
@@ -31,12 +30,13 @@ var tableCreator = []string{
 	)`,
 }
 
-func isTable() {}
 func createDB(db *sql.DB) error {
 	dbLog(fmt.Sprintf("mysql.go: createDB() var db: %v", db))
 	for _, sqlCommand := range tableCreator {
 		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop sqlCommand: %v", sqlCommand))
-		result, err := db.Exec(`SELECT User FROM mysql.user`)
+
+		result, err := db.Exec(`SHOW DATABASES;`)
+
 		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop db.Exec: %v: result: %v", sqlCommand, result))
 		if err != nil {
 			return fmt.Errorf("mysql.go: createDB(): db.Exec: problem with command: %v: error: %v", sqlCommand, err)

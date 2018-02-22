@@ -15,18 +15,15 @@ var Login bool
 var err error
 var filePathBase string
 
-type database struct {
-	db *sql.DB
-}
+var db *sql.DB
 
 func main() {
-	var db *database
-	err = db.registerDB()
+	db, err = registerDB()
 	if err != nil {
 		log.Println("main.go: main(): call to registerDB(): error: ", err)
 	}
-	sLog(fmt.Sprintf("main.go: main(): after db.register(): db.db = %v", db.db))
-	err = createDB(db.db)
+	sLog(fmt.Sprintf("main.go: main(): after db.register(): db = %v", db))
+	err = createDB(db)
 	if err != nil {
 		log.Println("main.go: main(): call to createDB(): error: ", err)
 	}

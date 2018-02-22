@@ -22,14 +22,14 @@ func main() {
 	// Register credentials for database with registerDB().
 	db, err = registerDB()
 	if err != nil {
-		log.Printf("main.go: main(): call to registerDB(): error: ", err)
+		log.Panicf("main.go: main(): call to registerDB(): error: %v", err)
 	}
 	sLog(fmt.Sprintf("main.go: main(): db.register(): db = %v", db))
 
 	// Check if the database exists isDB().
 	err = isDB(db)
 	if err != nil {
-		log.Printf("main.go: main(): call to isDB(): error: ", err)
+		log.Panicf("main.go: main(): call to isDB(): error: %v", err)
 	}
 
 	// Try to view events.

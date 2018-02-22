@@ -5,7 +5,7 @@ import (
 )
 
 var serverLogToggle = false
-var dbLogToggle = false
+var dbLogToggle = true
 
 func sLog(s string) {
 	if serverLogToggle == true {

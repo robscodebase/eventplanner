@@ -4,8 +4,8 @@ import (
 	"log"
 )
 
-var serverLogToggle = true
-var dbLogToggle = true
+var serverLogToggle = false
+var dbLogToggle = false
 
 func sLog(s string) {
 	if serverLogToggle == true {

@@ -15,12 +15,11 @@ func registerDB() (*sql.DB, error) {
 	if err != nil {
 		return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
 	}
-	defer db.Close()
 	return db, nil
 }
 
 var tableCreator = []string{
-	`CREATE DATABASE IF NOT EXISTS eventplanner DEFAULT CHARACTER SET = 'utf8' DEFAULT COLLATE 'utf8_general_ci';`,
+	`CREATE DATABASE IF NOT EXISTS eventplanner;`,
 	`USE eventplanner;`,
 	`CREATE TABLE IF NOT EXISTS events (
 		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
@@ -30,17 +29,18 @@ var tableCreator = []string{
 		description VARCHAR(255) NULL,
 		createdby VARCHAR(255) NULL,
 		PRIMARY KEY (ID)
-	)`,
+	);`,
 }
 
 func isDB(db *sql.DB) error {
+	dbLog(fmt.Sprintf("mysql.go: isDB()"))
 	db, err := sql.Open("mysql", dbLogIn)
 	if err != nil {
 		return fmt.Errorf("mysql.go: isDB(): sql.Open db: %v: error: %v", db, err)
 	}
 	defer db.Close()
 
-	// Ping the database.
+	// Ping the database with db.Ping().
 	if db.Ping() == driver.ErrBadConn {
 		return fmt.Errorf("mysql.go: isDB() db.Ping() error: could not ping database.")
 	}
@@ -68,7 +68,7 @@ func createDB(db *sql.DB) error {
 	for _, sqlCommand := range tableCreator {
 		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop before db.Exec sqlCommand: %v", sqlCommand))
 		result, err := db.Exec(sqlCommand)
-		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop after db.Exec: %v: result: %v", sqlCommand, result))
+		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop after result: %v", result))
 		if err != nil {
 			return fmt.Errorf("mysql.go: createDB(): db.Exec: problem with command: %v: error: %v", sqlCommand, err)
 		}
@@ -84,6 +84,10 @@ func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 		//return nil, fmt.Errorf("mysql.go: viewEvents(): rows = %v: error: %v", rows, err)
 	}
 	defer rows.Close()
+
+	for rows.Next() {
+		log.Println("rows", rows)
+	}
 
 	dbLog(fmt.Sprintf("mysql.go: viewDBEvents() var rows: %v", rows))
 }

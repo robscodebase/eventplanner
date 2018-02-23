@@ -130,3 +130,35 @@ func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 	}
 	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): events from rows: %v", events))
 }
+
+func addDBEvent(db *sql.DB) {
+	event := &Event{
+		ID:          int64(1234),
+		Name:        "First Event",
+		StartTime:   "monday",
+		EndTime:     "tuesday",
+		Description: "description 1",
+		CreatedBy:   "createdby1",
+	}
+
+	rowResult, err := writeResult(db.insert, event.ID, event.Name, event.StartTime, event.EndTime, event.Description, event.CreatedBy)
+	if err != nil {
+		fmt.Println(err)
+	}
+
+	dbLog(fmt.Sprintf("mysql.go: addEvent(): add finished: %v", rowResult))
+}
+
+func writeResult(sqlstmt *sql.Stmt, args ...interface{}) (sql.Result, error) {
+	result, err := sqlstmt.Exec(args...)
+	if err != nil {
+		return result, fmt.Errorf("mysql.go: writeResult(): could not execute statement: %v", err)
+	}
+	rowsAffected, err := result.RowsAffected()
+	if err != nil {
+		return result, fmt.Errorf("mysql.go: writeResult(): could not get rowsAffected: error: %v", err)
+	} else if rowsAffected != 1 {
+		return result, fmt.Errorf("mysql.go: writeResult(): expected 1 row affected, got %d", rowsAffected)
+	}
+	return result, nil
+}

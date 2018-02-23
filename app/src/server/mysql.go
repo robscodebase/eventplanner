@@ -80,6 +80,35 @@ func createDB(db *sql.DB) error {
 	return nil
 }
 
+type rowScanner interface {
+	Scan(dest ...interface{}) error
+}
+
+func scanEvent(scanRow rowScanner) (*Event, error) {
+	var (
+		id          int64
+		name        sql.NullString
+		starttime   sql.NullString
+		endtime     sql.NullString
+		description sql.NullString
+		createdby   sql.NullString
+	)
+
+	if err := scanRow.Scan(&id, &name, &starttime, &endtime, &description, &createdby); err != nil {
+		return nil, fmt.Errorf("mysql.go: scanEvent(): scanRow.Scan(): error: %v", err)
+	}
+
+	event := &Event{
+		ID:          id,
+		Name:        name.String,
+		StartTime:   starttime.String,
+		EndTime:     endtime.String,
+		Description: description.String,
+		CreatedBy:   createdby.String,
+	}
+	return event, nil
+}
+
 func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var db: %v", db))
 	rows, err := db.Query(`SELECT * FROM events`)
@@ -89,9 +118,15 @@ func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 	}
 	defer rows.Close()
 
+	var events []*Event
 	for rows.Next() {
-		log.Println("rows", rows)
-	}
+		event, err := scanEvent(rows)
+		if err != nil {
+			log.Println(err)
+			//return nil, fmt.Errorf("mysql.go: viewDBEvents(): scanEvent(): printing row: error: %v", err)
+		}
 
-	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var rows: %v", rows))
+		events = append(events, event)
+	}
+	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): events from rows: %v", events))
 }

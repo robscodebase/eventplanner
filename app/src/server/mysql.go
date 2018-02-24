@@ -41,8 +41,6 @@ func isDB(db *sql.DB) error {
 	//}
 	//defer db.Close()
 
-	// Ping the database with db.Ping().
-	dbLog(fmt.Sprintf("mysql.go: isDB(): ping db"))
 	if db.Ping() == driver.ErrBadConn {
 		return fmt.Errorf("mysql.go: isDB() db.Ping() error: could not ping database.")
 	}
@@ -141,24 +139,12 @@ func addDBEvent(db *sql.DB) {
 		CreatedBy:   "createdby1",
 	}
 
-	rowResult, err := writeResult(db.insert, event.ID, event.Name, event.StartTime, event.EndTime, event.Description, event.CreatedBy)
+	dbLog(fmt.Sprintf("mysql.go: addEvent(): addDBEvent event: %v", event))
+
+	rowResult, err := db.Exec(`INSERT INTO books (title, author, publishedDate, imageUrl, description, createdBy, createdById) VALUES (?, ?, ?, ?, ?, ?, ?)`, event.ID, event.Name, event.StartTime, event.EndTime, event.Description, event.CreatedBy)
 	if err != nil {
 		fmt.Println(err)
 	}
 
-	dbLog(fmt.Sprintf("mysql.go: addEvent(): add finished: %v", rowResult))
-}
-
-func writeResult(sqlstmt *sql.Stmt, args ...interface{}) (sql.Result, error) {
-	result, err := sqlstmt.Exec(args...)
-	if err != nil {
-		return result, fmt.Errorf("mysql.go: writeResult(): could not execute statement: %v", err)
-	}
-	rowsAffected, err := result.RowsAffected()
-	if err != nil {
-		return result, fmt.Errorf("mysql.go: writeResult(): could not get rowsAffected: error: %v", err)
-	} else if rowsAffected != 1 {
-		return result, fmt.Errorf("mysql.go: writeResult(): expected 1 row affected, got %d", rowsAffected)
-	}
-	return result, nil
+	dbLog(fmt.Sprintf("mysql.go: addEvent(): add finished rowResult: %v", rowResult))
 }

@@ -26,6 +26,7 @@ func main() {
 	}
 	sLog(fmt.Sprintf("main.go: main(): db.register(): db = %v", db))
 
+	// For loop tries every 10 seconds 6 times before failure.
 	// Check if the database exists isDB().
 	err = isDB(db)
 	if err != nil {
@@ -33,7 +34,7 @@ func main() {
 	}
 
 	// Try to add events.
-	addDBEvent(db)
+	//addDBEvent(db)
 	// Try to view events.
 	viewDBEvents(db)
 

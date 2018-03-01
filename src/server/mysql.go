@@ -6,14 +6,18 @@ import (
 	"fmt"
 	"github.com/go-sql-driver/mysql"
 	"log"
+	"time"
 )
 
 func registerDB() (*sql.DB, error) {
 	dbLog(fmt.Sprintf("mysql.go: registerDB()"))
-	db, err = sql.Open("mysql", dbLogIn)
-	dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open: %v", db))
-	if err != nil {
-		return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
+	for retries := 0; retries < 7; retries++ {
+		db, err = sql.Open("mysql", dbLogIn)
+		dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open: %v", db))
+		if err != nil && retries > 6 {
+			return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
+		}
+		time.Sleep(time.Second * 30)
 	}
 	return db, nil
 }
@@ -27,6 +31,8 @@ func isDB(db *sql.DB) error {
 	//}
 	//defer db.Close()
 
+	// Ping the database with db.Ping().
+	dbLog(fmt.Sprintf("mysql.go: isDB(): ping db"))
 	if db.Ping() == driver.ErrBadConn {
 		return fmt.Errorf("mysql.go: isDB() db.Ping() error: could not ping database.")
 	}
@@ -64,35 +70,6 @@ func createDB(db *sql.DB) error {
 	return nil
 }
 
-type rowScanner interface {
-	Scan(dest ...interface{}) error
-}
-
-func scanEvent(scanRow rowScanner) (*Event, error) {
-	var (
-		id          int64
-		name        sql.NullString
-		starttime   sql.NullString
-		endtime     sql.NullString
-		description sql.NullString
-		createdby   sql.NullString
-	)
-
-	if err := scanRow.Scan(&id, &name, &starttime, &endtime, &description, &createdby); err != nil {
-		return nil, fmt.Errorf("mysql.go: scanEvent(): scanRow.Scan(): error: %v", err)
-	}
-
-	event := &Event{
-		ID:          id,
-		Name:        name.String,
-		StartTime:   starttime.String,
-		EndTime:     endtime.String,
-		Description: description.String,
-		CreatedBy:   createdby.String,
-	}
-	return event, nil
-}
-
 func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var db: %v", db))
 	rows, err := db.Query(`SELECT * FROM events`)
@@ -102,37 +79,11 @@ func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 	}
 	defer rows.Close()
 
-	var events []*Event
 	for rows.Next() {
-		event, err := scanEvent(rows)
-		if err != nil {
-			log.Println(err)
-			//return nil, fmt.Errorf("mysql.go: viewDBEvents(): scanEvent(): printing row: error: %v", err)
-		}
-
-		events = append(events, event)
-	}
-	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): events from rows: %v", events))
-}
-
-func addDBEvent(db *sql.DB) {
-	event := &Event{
-		ID:          int64(1234),
-		Name:        "First Event",
-		StartTime:   "monday",
-		EndTime:     "tuesday",
-		Description: "description 1",
-		CreatedBy:   "createdby1",
+		log.Println("rows", rows)
 	}
 
-	dbLog(fmt.Sprintf("mysql.go: addEvent(): addDBEvent event: %v", event))
-
-	rowResult, err := db.Exec(`INSERT INTO books (title, author, publishedDate, imageUrl, description, createdBy, createdById) VALUES (?, ?, ?, ?, ?, ?, ?)`, event.ID, event.Name, event.StartTime, event.EndTime, event.Description, event.CreatedBy)
-	if err != nil {
-		fmt.Println(err)
-	}
-
-	dbLog(fmt.Sprintf("mysql.go: addEvent(): add finished rowResult: %v", rowResult))
+	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var rows: %v", rows))
 }
 
 func createDemoDB(db *sql.DB) {

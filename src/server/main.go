@@ -9,6 +9,7 @@ import (
 	"log"
 	"net/http"
 	"os"
+	"time"
 )
 
 var Login bool
@@ -24,13 +25,23 @@ func main() {
 	if err != nil {
 		log.Panicf("main.go: main(): call to registerDB(): error: %v", err)
 	}
-	sLog(fmt.Sprintf("main.go: main(): db.register(): db = %v", db))
+	sLog(fmt.Sprintf("main.go: main(): db.register(): db: %v", db))
 
 	// For loop tries every 10 seconds 6 times before failure.
 	// Check if the database exists isDB().
-	err = isDB(db)
-	if err != nil {
-		log.Panicf("main.go: main(): call to isDB(): error: %v", err)
+	for retries := 0; retries < 70; retries++ {
+		err = isDB(db)
+		if err != nil {
+			dbLog(fmt.Sprintf("main.go: call to isDB(): waiting for db to be ready: retry: %v", retries))
+			time.Sleep(time.Second * 10)
+			if retries > 69 {
+				log.Panicf("main.go: call to isDB(): could not open db: db: %v: err: %v", db, err)
+			}
+		} else {
+			dbLog(fmt.Sprintf("main.go: call to isDB(): success: no of retries: %v", retries))
+			retries = 71
+		}
+
 	}
 
 	// Try to add events.
@@ -39,7 +50,7 @@ func main() {
 	viewDBEvents(db)
 
 	// Create demo database entries.
-	createDemoDB(db)
+	//createDemoDB(db)
 
 	// Activate routing handlers with runHandlers()
 	runHandlers()

@@ -3,8 +3,7 @@ RUN apt-get update
 
 RUN go get github.com/gorilla/mux && \
     go get github.com/gorilla/handlers && \
-    go get -u github.com/go-sql-driver/mysql && \
-    apt-get install -y vim
+    go get -u github.com/go-sql-driver/mysql
 
 COPY . /go/src/eventplanner
 WORKDIR /go/src/eventplanner

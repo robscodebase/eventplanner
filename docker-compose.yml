@@ -1,17 +1,17 @@
 version: '3'
 
 services:
-    db:
-        image: mysql
-        restart: always
-        environment:
-            MYSQL_ROOT_PASSWORD: insecure
-
     event-planner:
         build: .
         ports: 
             - "8081:8081"
         depends_on:
             - db
+        container_name: event-planner
 
 
+    db:
+        image: mysql
+        environment:
+            MYSQL_ROOT_PASSWORD: insecure
+        container_name: mysql-event-planner

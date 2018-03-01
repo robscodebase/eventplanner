@@ -11,14 +11,17 @@ import (
 
 func registerDB() (*sql.DB, error) {
 	dbLog(fmt.Sprintf("mysql.go: registerDB()"))
-	for retries := 0; retries < 7; retries++ {
+	for retries := 0; retries < 70; retries++ {
 		db, err = sql.Open("mysql", dbLogIn)
-		dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open: %v", db))
-		if err != nil && retries > 6 {
-			return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
+		if err != nil {
+			dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open error: retry count: %v", retries))
+			time.Sleep(time.Second * 10)
+			if retries > 69 {
+				return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
+			}
 		}
-		time.Sleep(time.Second * 30)
 	}
+	dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open success: db: %v", db))
 	return db, nil
 }
 

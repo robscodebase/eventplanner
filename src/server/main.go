@@ -72,7 +72,7 @@ var (
 func runHandlers() {
 	sLog("main.go: main(): runHandlers(): running handlers.")
 	r := mux.NewRouter()
-	r.Handle("/", http.RedirectHandler("/home", http.StatusFound))
+	r.Handle("/", http.RedirectHandler("/edit-events", http.StatusFound))
 
 	r.Methods("GET").Path("/register").
 		Handler(errorCheck(registerHandler))

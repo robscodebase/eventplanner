@@ -18,20 +18,6 @@ func registerDB() (*sql.DB, error) {
 	return db, nil
 }
 
-var tableCreator = []string{
-	`CREATE DATABASE IF NOT EXISTS eventplanner;`,
-	`USE eventplanner;`,
-	`CREATE TABLE IF NOT EXISTS events (
-		id INT UNSIGNED NOT NULL AUTO_INCREMENT,
-		name VARCHAR(255) NULL,
-		starttime VARCHAR(255) NULL,
-		endtime VARCHAR(255) NULL,
-		description VARCHAR(255) NULL,
-		createdby VARCHAR(255) NULL,
-		PRIMARY KEY (ID)
-	);`,
-}
-
 func isDB(db *sql.DB) error {
 	dbLog(fmt.Sprintf("mysql.go: isDB()"))
 	dbLog(fmt.Sprintf("mysql.go: isDB(): open db"))
@@ -69,7 +55,7 @@ func isDB(db *sql.DB) error {
 
 func createDB(db *sql.DB) error {
 	dbLog(fmt.Sprintf("mysql.go: createDB(): var db: %v", db))
-	for _, sqlCommand := range tableCreator {
+	for _, sqlCommand := range createDBstmt {
 		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop before db.Exec sqlCommand: %v", sqlCommand))
 		result, err := db.Exec(sqlCommand)
 		dbLog(fmt.Sprintf("mysql.go: createDB(): inside for loop after result: %v", result))
@@ -94,4 +80,21 @@ func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 	}
 
 	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var rows: %v", rows))
+}
+
+func createDemoDB(db *sql.DB) {
+	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var db: %v", db))
+	for _, v := range demoEvents {
+		insertStmt, err := db.Prepare("INSERT INTO events (id, name, startime, endtime, description, createdby) VALUES(?, ?, ?, ?, ?, ?)")
+		results, err := insertStmt.Exec(v)
+		if err != nil {
+			log.Println(err)
+		}
+
+		rowCnt, err := results.RowsAffected()
+		if err != nil {
+			log.Println(err)
+		}
+		log.Println("rowCnt: ", rowCnt)
+	}
 }

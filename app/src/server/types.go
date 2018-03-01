@@ -20,7 +20,7 @@ type Event struct {
 }
 
 type User struct {
-	ID        string
+	ID        int64
 	UserName  string
 	FirstName string
 	LastName  string

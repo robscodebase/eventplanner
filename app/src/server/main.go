@@ -14,7 +14,7 @@ import (
 var Login bool
 var err error
 var filePathBase string
-var dbLogIn = "root:insecure@(mysql:3306)/mysql"
+var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
 
 var db *sql.DB
 
@@ -34,6 +34,9 @@ func main() {
 
 	// Try to view events.
 	viewDBEvents(db)
+
+	// Create demo database entries.
+	createDemoDB(db)
 
 	// Activate routing handlers with runHandlers()
 	runHandlers()
@@ -71,6 +74,8 @@ func runHandlers() {
 
 	r.Methods("GET").Path("/edit-event").
 		Handler(errorCheck(editEventHandler))
+
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/go/src/eventplanner/src/server/templates")))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 	log.Print("Listening on port 8081")
@@ -130,7 +135,7 @@ func formatError(err error, format string, v ...interface{}) *errorMessage {
 
 func sessionData(r *http.Request) *User {
 	return &User{
-		ID:       "SECURE ID",
-		UserName: "ADMIN",
+		ID:       1,
+		UserName: "demo",
 	}
 }

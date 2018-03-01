@@ -23,5 +23,5 @@ You must have Docker and Docker-Compose installed on your machine.
 
 ### Demo App Creditials
 
-* Username: 'demo'
-* Password: 'demo'
+* Username: `demo`
+* Password: `demo`

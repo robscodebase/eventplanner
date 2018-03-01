@@ -50,7 +50,7 @@ func main() {
 	viewDBEvents(db)
 
 	// Create demo database entries.
-	//createDemoDB(db)
+	createDemoDB(db)
 
 	// Activate routing handlers with runHandlers()
 	runHandlers()

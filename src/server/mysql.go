@@ -92,16 +92,18 @@ func viewDBEvents(db *sql.DB) { // ([]*Event, error) {
 func createDemoDB(db *sql.DB) {
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var db: %v", db))
 	for _, v := range demoEvents {
-		insertStmt, err := db.Prepare("INSERT INTO events (id, name, startime, endtime, description, createdby) VALUES(?, ?, ?, ?, ?, ?)")
-		results, err := insertStmt.Exec(v)
+		insertStmt, err := db.Prepare("INSERT INTO events (id, name, starttime, endtime, description, createdby) VALUES(?, ?, ?, ?, ?, ?)")
+		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): insertStmt: %v", insertStmt))
+		results, err := insertStmt.Exec(v.ID, v.Name, v.StartTime, v.EndTime, v.Description, v.Description)
 		if err != nil {
 			log.Println(err)
 		}
+		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var results: %v", results))
 
-		rowCnt, err := results.RowsAffected()
-		if err != nil {
-			log.Println(err)
-		}
-		log.Println("rowCnt: ", rowCnt)
+		//rowCnt, err := results.RowsAffected()
+		//if err != nil {
+		//log.Println(err)
+		//}
+		//log.Println("rowCnt: ", rowCnt)
 	}
 }

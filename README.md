@@ -12,14 +12,12 @@ You must have Docker and Docker-Compose installed on your machine.
   * `git clone https://github.com/robscodebase/eventplanner.git`
 
 
-#### Run Docker-Compose
+### Run Docker-Compose
 
 * Navigate to /eventplanner
-  * 'docker-compose up'
-  or
-  * 'sudo docker-compose up'
+  * `sudo docker-compose up`
 
-#### View App
+### View App
 
 * Open browser and navigate to localhost:8081/
 

@@ -32,6 +32,8 @@ func main() {
 		log.Panicf("main.go: main(): call to isDB(): error: %v", err)
 	}
 
+	// Try to add events.
+	addDBEvent(db)
 	// Try to view events.
 	viewDBEvents(db)
 

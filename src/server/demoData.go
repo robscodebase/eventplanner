@@ -1,11 +1,8 @@
 package main
 
 var demoUser = &User{
-	ID:        1,
-	UserName:  "demo",
-	FirstName: "Mr. Demo",
-	LastName:  "Administrator",
-	Email:     "demo@notreal.com",
+	Username: "demo",
+	Secret:   []byte("demo"),
 }
 
 var demoEvents = []*Event{demoEvent1, demoEvent2, demoEvent3, demoEvent4, demoEvent5, demoEvent6, demoEvent7, demoEvent8, demoEvent9, demoEvent10}

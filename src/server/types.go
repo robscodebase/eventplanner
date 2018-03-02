@@ -20,11 +20,9 @@ type Event struct {
 }
 
 type User struct {
-	ID        int64
-	UserName  string
-	FirstName string
-	LastName  string
-	Email     string
+	Username      string
+	Secret        []byte
+	CookieSession string
 }
 
 type errorCheck func(http.ResponseWriter, *http.Request) *errorMessage

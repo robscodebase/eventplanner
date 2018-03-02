@@ -11,5 +11,11 @@ var createDBstmt = []string{
      description VARCHAR(255) NULL,
      createdby VARCHAR(255) NULL,
      PRIMARY KEY (ID)
-   );`,
+     );`,
+	`CREATE TABLE IF NOT EXISTS users (
+	 username VARCHAR(255),
+	 secret BINARY(255),
+	 cookieSession VARCHAR(255),
+	 PRIMARY KEY (username)
+ 	 );`,
 }

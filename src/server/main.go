@@ -146,10 +146,3 @@ func formatError(err error, format string, v ...interface{}) *errorMessage {
 		Code:    500,
 	}
 }
-
-func sessionData(r *http.Request) *User {
-	return &User{
-		ID:       1,
-		UserName: "demo",
-	}
-}

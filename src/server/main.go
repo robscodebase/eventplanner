@@ -89,6 +89,9 @@ func runHandlers() {
 	r.Methods("GET").Path("/edit-event").
 		Handler(errorCheck(editEventHandler))
 
+	r.Methods("POST").Path("/register").
+		Handler(errorCheck(registerHandler))
+
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/go/src/eventplanner/src/server/templates")))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
@@ -96,16 +99,19 @@ func runHandlers() {
 	log.Print(http.ListenAndServe(":8081", r))
 }
 
-// registerHandler() serves the HTML page for register.html.
-func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	sLog("main.go: main(): runHandlers(): registerHandler(): call to handler.")
-	return register.runTemplate(w, r, nil)
-}
-
 // loginHandler() serves the HTML page for login.html.
 func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main(): runHandlers(): loginHandler() call to handler.")
 	return login.runTemplate(w, r, nil)
+}
+
+// registerHandler() serves the HTML page for register.html.
+func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	sLog("main.go: registerHandler()")
+	if r.Method == "POST" {
+		log.Println("main.go: r.Method == POST: %v", r.Method)
+	}
+	return register.runTemplate(w, r, nil)
 }
 
 // viewHandler() serves the HTML page for view-events.html.

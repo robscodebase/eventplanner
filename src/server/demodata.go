@@ -1,3 +1,4 @@
+// demodata.go contains the data for populating the db on startup.
 package main
 
 var demoUser = &User{

@@ -1,3 +1,4 @@
+// types.go contains most of the structs and types encountered in the program including Event, User, and Page data.
 package main
 
 import (

@@ -8,13 +8,6 @@ import (
 	"net/http"
 )
 
-func sessionData(r *http.Request) *User {
-	return &User{
-		Username:      "demo",
-		CookieSession: "demo",
-	}
-}
-
 // userLogin() checks entered credentials
 // against the db.  If no match is found
 // an empty user, and error is returned,

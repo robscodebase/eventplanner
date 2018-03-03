@@ -1,3 +1,6 @@
+// templates.go contains functions which read html templates
+// from the templates folder, return the template to main,
+// and populate data using template variables.
 package main
 
 import (
@@ -13,7 +16,12 @@ type eventPlannerTemplate struct {
 	eventPlannerTemplate *template.Template
 }
 
+// compileTemplate() builds the html template adding the header and footer
+// using the name provided by the caller.
 func compileTemplate(templateName string) *eventPlannerTemplate {
+	slog(fmt.Sprintf("templates.go: compileTemplate(): template name: %v", templateName))
+	// For template login.html and register.html a header and footer
+	// is not needed.
 	if templateName == "login.html" {
 		login := template.Must(template.ParseFiles(filePath + "/templates/" + templateName))
 		return &eventPlannerTemplate{login.Lookup(templateName)}
@@ -22,6 +30,7 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 		register := template.Must(template.ParseFiles(filePath + "/templates/" + templateName))
 		return &eventPlannerTemplate{register.Lookup(templateName)}
 	}
+
 	// Add the main template file.
 	main := template.Must(template.ParseFiles(filePath + "/templates/main.html"))
 
@@ -36,10 +45,14 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 	template.Must(main.New("header").Parse(string(header)))
 	template.Must(main.New("body").Parse(string(body)))
 	template.Must(main.New("footer").Parse(string(footer)))
+	slog(fmt.Sprintf("templates.go: compileTemplate(): template pase successful return: %v", templateName))
 	return &eventPlannerTemplate{main.Lookup("main.html")}
 }
 
+// readFile() takes a file name and returns
+// a []byte.  readFile() panics on error.
 func readFile(fileName string) []byte {
+	slog(fmt.Sprintf("templates.go: readFile(): file name: %v", fileName))
 	template, err := ioutil.ReadFile(filePath + "/templates/" + fileName)
 	if err != nil {
 		panic(fmt.Errorf("templates.go: readFile(): could not read file: %v: %v", fileName, err))
@@ -47,22 +60,11 @@ func readFile(fileName string) []byte {
 	return template
 }
 
+// runTemplate() combines template variables and the html template for final delivery to client.
 func (template *eventPlannerTemplate) runTemplate(w http.ResponseWriter, r *http.Request, input interface{}) *errorMessage {
-	session := struct {
-		Input       interface{}
-		AuthEnabled bool
-		User        *User
-	}{
-		Input:       input,
-		AuthEnabled: true,
-	}
-
-	if Login {
-		session.User = sessionData(r)
-	}
-
-	if err := template.eventPlannerTemplate.Execute(w, session); err != nil {
-		return formatError(err, "templates.go: runTemplate(): could not execute template: %v")
+	slog(fmt.Sprintf("templates.go: runTemplate(): file name: %v", input))
+	if err := template.eventPlannerTemplate.Execute(w, input); err != nil {
+		return fmt.Errorf(err, "templates.go: runTemplate(): could not execute template: %v")
 	}
 	return nil
 }

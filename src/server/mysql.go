@@ -89,7 +89,7 @@ func isDB(db *sql.DB) error {
 func createDB(db *sql.DB) error {
 	dbLog(fmt.Sprintf("mysql.go: createDB(): var db: %v", db))
 	for _, sqlCommand := range createDBstmt {
-		result, err := db.Exec(sqlCommand)
+		_, err := db.Exec(sqlCommand)
 		if err != nil {
 			return fmt.Errorf("mysql.go: createDB(): db.Exec: problem exec command: error: %v", err)
 		}
@@ -125,7 +125,8 @@ func createDemoDB(db *sql.DB) {
 		// Insert demo event into db.
 		results, err := insertDemoEvent.Exec(demo.ID, demo.Name, demo.StartTime, demo.EndTime, demo.Description, demo.Description)
 		if err != nil {
-			log.Println(err)
+			dbLog(fmt.Sprintf("mysql.go: createDemoDB(): problem creating demo db most likely entries already exist: %v", err))
+			return
 		}
 		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): insertDemoEvent success: results: %v", results))
 	}
@@ -142,7 +143,8 @@ func createDemoDB(db *sql.DB) {
 	// Insert user into db.
 	results, err := insertDemoUser.Exec(demoUser.Username, secret)
 	if err != nil {
-		log.Println(err)
+		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): problem creating demo user most likely entries already exist: %v", err))
+		return
 	}
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var results: %v", results))
 }

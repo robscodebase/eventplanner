@@ -55,11 +55,11 @@ func passwordCompare(storedPassword, enteredPassword []byte) error {
 // and error on failure.
 func registerUser(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, *User, error) {
 	var user *User
-	sLog("auth.go: registerUser()")
+	sLog(fmt.Sprintf("auth.go: registerUser(): r: %v", r))
 	// Set username and password variables to compare with potential db entries
 	// and to set the db entry if registration is successful.
 	username := r.FormValue("username")
-	user.Secret = []byte(r.FormValue("password"))
+	user = &User{Secret: []byte(r.FormValue("password"))}
 
 	// If the response from the db matches the
 	// requested username the request is denied

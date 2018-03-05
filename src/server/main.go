@@ -107,9 +107,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 // registerHandler() serves the HTML page for register.html.
 func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	sLog("main.go: registerHandler()")
+	sLog(fmt.Sprintf("main.go: registerHandler(): r: %v", r))
 	if r.Method == "POST" {
-		log.Println("main.go: r.Method == POST: %v", r.Method)
+		log.Println("username: ", r.FormValue("username"))
+		log.Println("password: ", r.FormValue("password"))
+		message, user, err := registerUser(db, w, r)
+		if err != nil {
+			return &errorMessage{Error: err, Message: fmt.Sprintf("main.go: registerHandler(): registerUser() message: %v, user: %v", message, user), Code: 999}
+		}
+		sLog(fmt.Sprintf("main.go: registerHandler(): message: %v, user: %v", message, user))
 	}
 	return register.runTemplate(w, r, nil)
 }

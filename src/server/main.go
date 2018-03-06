@@ -108,16 +108,30 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 // registerHandler() serves the HTML page for register.html.
 func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog(fmt.Sprintf("main.go: registerHandler(): r: %v", r))
-	if r.Method == "POST" {
-		log.Println("username: ", r.FormValue("username"))
-		log.Println("password: ", r.FormValue("password"))
-		message, user, err := registerUser(db, w, r)
-		if err != nil {
-			return &errorMessage{Error: err, Message: fmt.Sprintf("main.go: registerHandler(): registerUser() message: %v, user: %v", message, user), Code: 999}
-		}
-		sLog(fmt.Sprintf("main.go: registerHandler(): message: %v, user: %v", message, user))
+	var user *User
+	var message string
+	var err error
+
+	// Check for an existing session.
+	user, err = verifySession(db, r)
+	if err != nil {
 	}
-	return register.runTemplate(w, r, nil)
+
+	// If the user is empty continue to registration.
+	if user == (&User{}) {
+		if r.Method == "POST" {
+			message, user, err = registerUser(db, w, r)
+			if err != nil {
+				return &errorMessage{Error: err, Message: fmt.Sprintf("main.go: registerHandler(): registerUser() message: %v, user: %v", message, user)}
+			}
+			sLog(fmt.Sprintf("main.go: registerHandler(): message: %v, user: %v", message, user))
+		}
+		return register.runTemplate(w, r, nil)
+	}
+
+	// If the user is not empty redirect to the view-events page.
+	http.Redirect(w, r, "/view-events", http.StatusFound)
+	return nil
 }
 
 // viewHandler() serves the HTML page for view-events.html.
@@ -147,14 +161,5 @@ func (errCheck errorCheck) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		log.Printf("main.go: ServeHTTP(): error: status code: %d, message: %s, error: %#v",
 			errcheck.Code, errcheck.Message, errcheck.Error)
 		http.Error(w, errcheck.Message, errcheck.Code)
-	}
-}
-
-// formatError returns the status code and error message for failures.
-func formatError(err error, format string, v ...interface{}) *errorMessage {
-	return &errorMessage{
-		Error:   err,
-		Message: fmt.Sprintf(format, v...),
-		Code:    500,
 	}
 }

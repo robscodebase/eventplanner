@@ -2,7 +2,7 @@
 package main
 
 var demoUser = &User{
-	Username: "demo",
+	Username: "demo@demo.com",
 	Secret:   []byte("demo"),
 }
 

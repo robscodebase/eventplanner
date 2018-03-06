@@ -9,6 +9,7 @@ type PageData struct {
 	Event
 	User
 	PageName string
+	Message  string
 }
 
 type Event struct {

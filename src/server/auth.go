@@ -60,23 +60,21 @@ func registerUser(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, *
 	// and to set the db entry if registration is successful.
 	username := r.FormValue("username")
 	user = &User{Secret: []byte(r.FormValue("password"))}
+	err := db.QueryRow("SELECT username FROM users WHERE username=?", username).Scan(&username)
+	if err != sql.ErrNoRows {
+		return "userExists", nil, nil
+	}
 
 	// If the response from the db matches the
 	// requested username the request is denied
 	// and a message asking for a different username
 	// is delivered.
 	sLog(fmt.Sprintf("auth.go: registerUser(): username: %v", username))
-	db.QueryRow("SELECT username, secret FROM users WHERE username = ?", user.Username).Scan(&user.Username)
-	if user.Username == username {
-		sLog(fmt.Sprintf("auth.go: registerUser(): user already exists: %v", username))
-		return "Username already exists. Please choose a different username.", user, nil
-	} else {
-		user.CookieSession = serveCookie(w, r)
-		err = storeSession(db, user)
-		if err != nil {
-			sLog(fmt.Sprintf("auth.go: registerUser(): call to storeSession error: %v", err))
-			return "Problem storing session in db.", user, err
-		}
+	user.CookieSession = serveCookie(w, r)
+	err = storeSession(db, user)
+	if err != nil {
+		sLog(fmt.Sprintf("auth.go: registerUser(): call to storeSession error: %v", err))
+		return "userExists", nil, nil
 	}
 	sLog(fmt.Sprintf("auth.go: registerUser(): registration successful: %v", username))
 	// Return the struct with new user data.
@@ -100,7 +98,7 @@ func storeSession(db *sql.DB, user *User) error {
 	// Execute the db insert statement for the new user.
 	_, err = registerStmt.Exec(user.Username, user.Secret, user.CookieSession)
 	if err != nil {
-		return fmt.Errorf("auth.go: registerUser(): error executing registerStmt: %v: error: %v", registerStmt, err)
+		return fmt.Errorf("auth.go: registerUser(): storeSession(): error executing registerStmt: %v: error: %v", registerStmt, err)
 	}
 	return nil
 }
@@ -110,11 +108,11 @@ func serveCookie(w http.ResponseWriter, r *http.Request) string {
 	sLog("auth.go: serveCookie():")
 	// r.Cookie tries to retrieve the cookie.
 	// a new cookie is created on failure.
-	cookie, err := r.Cookie("docker-golang-mysql-event-planner")
+	cookie, err := r.Cookie("golang-event-planner")
 	if err != nil {
 		cookieID, _ := uuid.NewV4()
 		cookie = &http.Cookie{
-			Name:   "docker-golang-mysql-event-planner",
+			Name:   "golang-event-planner",
 			Value:  cookieID.String(),
 			MaxAge: 0,
 		}
@@ -138,14 +136,15 @@ func verifySession(db *sql.DB, r *http.Request) (*User, error) {
 	cookie, err := r.Cookie("golang-event-planner")
 	if err != nil {
 		// Cookie was not found.
-		return user, fmt.Errorf("auth.go: verifySession(): error getting cookie: %v", err)
+		return nil, fmt.Errorf("auth.go: verifySession(): error getting cookie: %v", err)
 	}
+	sLog(fmt.Sprintf("auth.go: verifySession(): found cookie: %v", cookie))
 	// If a cookie was found, retrieve the user data and return user.
-	user.CookieSession = cookie.Value
+	user = &User{CookieSession: cookie.Value}
 	err = db.QueryRow("SELECT username FROM users WHERE cookieSession=?", cookie.Value).Scan(&user.Username)
 	if err != nil {
 		// Could not find cookie match.
-		return user, fmt.Errorf("auth.go: verifySession(): db.QueryRow(): cookie not found in db error: %v", err)
+		return nil, fmt.Errorf("auth.go: verifySession(): db.QueryRow(): cookie not found in db error: %v", err)
 	}
 	sLog(fmt.Sprintf("auth.go: verifySession(): success: user: %v", user))
 	return user, nil

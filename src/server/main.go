@@ -114,36 +114,41 @@ func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 	// Check for an existing session.
 	user, err = verifySession(db, r)
-	if err != nil {
+	if user != nil {
+		http.Redirect(w, r, "/view-events", http.StatusFound)
 	}
 
 	// If the user is empty continue to registration.
-	if user == (&User{}) {
-		if r.Method == "POST" {
-			message, user, err = registerUser(db, w, r)
-			if err != nil {
-				return &errorMessage{Error: err, Message: fmt.Sprintf("main.go: registerHandler(): registerUser() message: %v, user: %v", message, user)}
-			}
-			sLog(fmt.Sprintf("main.go: registerHandler(): message: %v, user: %v", message, user))
+	if r.Method == "POST" {
+		message, user, err = registerUser(db, w, r)
+		if err != nil {
+			return &errorMessage{Error: err, Message: fmt.Sprintf("main.go: registerHandler(): registerUser() message: %v, user: %v", message, user)}
 		}
-		return register.runTemplate(w, r, nil)
+		if message == "userExists" {
+			p := &PageData{Message: "Username already exists. Please choose something else."}
+			return register.runTemplate(w, r, p)
+		}
+		sLog(fmt.Sprintf("main.go: registerHandler(): message: %v, user: %v", message, user))
+		http.Redirect(w, r, "/view-events", http.StatusFound)
 	}
 
 	// If the user is not empty redirect to the view-events page.
-	http.Redirect(w, r, "/view-events", http.StatusFound)
-	return nil
+	p := &PageData{Message: "We will never share your information"}
+	return register.runTemplate(w, r, p)
 }
 
 // viewHandler() serves the HTML page for view-events.html.
 func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	sLog("main.go: viewEventsHandler()")
 	var user *User
 	var err error
 	// Check for an existing session.
 	user, err = verifySession(db, r)
 	if err != nil {
+		log.Printf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err)
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
-	log.Println("user", user)
+	log.Printf("main.go: viewEventsHandler(): user: %v", user)
 	p := &PageData{PageName: "View Events"}
 	sLog("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
 	return viewEvents.runTemplate(w, r, p)

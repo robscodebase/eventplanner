@@ -51,7 +51,7 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 	template.Must(main.New("header").Parse(string(header)))
 	template.Must(main.New("body").Parse(string(body)))
 	template.Must(main.New("footer").Parse(string(footer)))
-	sLog(fmt.Sprintf("templates.go: compileTemplate(): template pase successful return: %v", templateName))
+	sLog(fmt.Sprintf("templates.go: compileTemplate(): template parse successful return: %v", templateName))
 	return &eventPlannerTemplate{main.Lookup("main.html")}
 }
 

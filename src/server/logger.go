@@ -14,13 +14,13 @@ var dbLogToggle = true
 // sLog() controls the logging mechanism for functions that rely on the server.
 func sLog(s string) {
 	if serverLogToggle == true {
-		log.Println(s)
+		log.Println("server log: ", s)
 	}
 }
 
 // dbLog() controls the logging mechanism for functions that rely on the database.
 func dbLog(s string) {
 	if dbLogToggle == true {
-		log.Println(s)
+		log.Println("database log: ", s)
 	}
 }

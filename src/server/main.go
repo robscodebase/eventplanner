@@ -136,6 +136,14 @@ func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 // viewHandler() serves the HTML page for view-events.html.
 func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	var user *User
+	var err error
+	// Check for an existing session.
+	user, err = verifySession(db, r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+	log.Println("user", user)
 	p := &PageData{PageName: "View Events"}
 	sLog("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
 	return viewEvents.runTemplate(w, r, p)
@@ -143,6 +151,12 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 // addEventHandler() serves the HTML page for add-event.html.
 func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	var user *User
+	user, err = verifySession(db, r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+	log.Println("user", user)
 	p := &PageData{PageName: "Add Event"}
 	sLog("main.go: main(): runHandlers(): addEventsHandler(). call to handler")
 	return addEvent.runTemplate(w, r, p)
@@ -150,6 +164,12 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 // editEventHandler() serves the HTML page for edit-event.html.
 func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	var user *User
+	user, err = verifySession(db, r)
+	if err != nil {
+		http.Redirect(w, r, "/login", http.StatusFound)
+	}
+	log.Println("user", user)
 	p := &PageData{PageName: "Edit Event"}
 	sLog("main.go: main(): runHandlers(): editEventsHandler(). call to handler")
 	return editEvent.runTemplate(w, r, p)

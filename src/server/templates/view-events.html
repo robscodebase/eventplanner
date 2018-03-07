@@ -1,8 +1,10 @@
         <!-- event data start -->
         <div class="col-12 col-md-10">
           <div class="card-deck">
+            <div class="row">
             {{if .Events}}
             {{range .Events}}
+            <div class="col-12 col-sm-6 col-lg-4 p-sm-0">
             <div class="card bg-inverse card-outline-primary">
               <div class="card-block">
                 <h4 class="card-title text-primary">{{.Name}}</h4>
@@ -24,12 +26,17 @@
               <!-- card-block end -->
             </div>
             <!-- card end -->
+          </div>
+          <!-- colum end -->
+
             {{else}}
             <p class="text-primary">{{.Message}}</p>
             {{end}}
             <p>No events found.</p>
             {{end}}
             <p class="text-primary">{{.Message}}</p>
+          </div>
+          <!-- row end -->
           </div>
           <!-- card-deck end -->
         </div>

@@ -13,7 +13,7 @@ var demoEvent1 = &Event{
 	Name:        "Create Demo Events",
 	StartTime:   "2018-02-28 19:00",
 	EndTime:     "2018-02-28 20:00",
-	Description: "Create demo events using time.Now() and time.Add() to create events that start from the time the app is run for the first time.",
+	Description: "Create demo events using time and add to create events that start from the time the app is run for the first time.",
 	UserID:   1,
 }
 

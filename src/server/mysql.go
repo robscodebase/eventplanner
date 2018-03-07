@@ -19,7 +19,7 @@ var createDBstmt = []string{
      starttime VARCHAR(255) NULL,
      endtime VARCHAR(255) NULL,
      description VARCHAR(255) NULL,
-     username VARCHAR(255) NULL,
+     userid INT UNSIGNED NOT NULL,
      PRIMARY KEY (id)
      );`,
 	`CREATE TABLE IF NOT EXISTS users (
@@ -97,10 +97,10 @@ func createDemoDB(db *sql.DB) {
 	// Range over each of the demoEvents and insert them in to the db.
 	for _, demo := range demoEvents {
 		// Prepare stmt.
-		insertDemoEvent, err := db.Prepare("INSERT INTO events (id, name, starttime, endtime, description, username) VALUES(?, ?, ?, ?, ?, ?)")
+		insertDemoEvent, err := db.Prepare("INSERT INTO events (name, starttime, endtime, description, userid) VALUES(?, ?, ?, ?, ?)")
 		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): insertDemoEvent: %v", insertDemoEvent))
 		// Insert demo event into db.
-		results, err := insertDemoEvent.Exec(demo.ID, demo.Name, demo.StartTime, demo.EndTime, demo.Description, demo.Description)
+		results, err := insertDemoEvent.Exec(demo.Name, demo.StartTime, demo.EndTime, demo.Description, demo.UserID)
 		if err != nil {
 			dbLog(fmt.Sprintf("mysql.go: createDemoDB(): problem creating demo db most likely entries already exist: %v", err))
 			return
@@ -159,8 +159,8 @@ func scanEvent(eventScan eventScanner) (*Event, error) {
 
 func listEvents(db *sql.DB, username string) ([]*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: listEvents(): username: %v", username))
-	//rows, err := db.Query("SELECT * FROM events WHERE username = ?", username)
-	rows, err := db.Query("SELECT * FROM events")
+	rows, err := db.Query("SELECT * FROM events WHERE userid = ?", 1)
+	//rows, err := db.Query("SELECT * FROM events")
 	if err != nil {
 		return nil, fmt.Errorf("mysql.go: listEvents(): db.Query(): error: %v", err)
 	}

@@ -6,7 +6,7 @@ import (
 )
 
 type PageData struct {
-	Events *[]Event
+	Events []*Event
 	User
 	PageName string
 	Message  string

@@ -203,7 +203,7 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	}
 	log.Printf("main.go: viewEventsHandler(): events from listEvents: %v", events)
 	log.Printf("main.go: viewEventsHandler(): user: %v", user)
-	p := &PageData{PageName: "View Events"}
+	p := &PageData{Events: events, PageName: "View Events"}
 	sLog("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
 	return viewEvents.runTemplate(w, r, p)
 }

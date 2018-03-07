@@ -6,7 +6,7 @@ import (
 )
 
 type PageData struct {
-	Event
+	Events *[]Event
 	User
 	PageName string
 	Message  string
@@ -18,10 +18,11 @@ type Event struct {
 	StartTime   string
 	EndTime     string
 	Description string
-	CreatedBy   string
+	UserID      int64
 }
 
 type User struct {
+	ID            int64
 	Username      string
 	Secret        []byte
 	CookieSession string

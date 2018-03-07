@@ -100,6 +100,7 @@ func storeSession(db *sql.DB, user *User, status string) error {
 	sLog(fmt.Sprintf("auth.go: storeSession(): encrypt password: %v", user.Secret))
 	// Prepare the db insert statement for the new user.
 	if status == "register" {
+		sLog(fmt.Sprintf("auth.go: storeSession(): encrypt password: %v", user.Secret))
 		registerStmt, err := db.Prepare("INSERT users SET username=?,secret=?,cookieSession=?")
 		if err != nil {
 			return fmt.Errorf("auth.go: storSession(): registerStmt: %v: error: %v", registerStmt, err)

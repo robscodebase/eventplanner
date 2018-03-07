@@ -8,7 +8,6 @@ import (
 	"github.com/go-sql-driver/mysql"
 	"golang.org/x/crypto/bcrypt"
 	"log"
-	"time"
 )
 
 var createDBstmt = []string{
@@ -20,14 +19,15 @@ var createDBstmt = []string{
      starttime VARCHAR(255) NULL,
      endtime VARCHAR(255) NULL,
      description VARCHAR(255) NULL,
-     createdby VARCHAR(255) NULL,
-     PRIMARY KEY (ID)
+     username VARCHAR(255) NULL,
+     PRIMARY KEY (id)
      );`,
 	`CREATE TABLE IF NOT EXISTS users (
+     id INT UNSIGNED NOT NULL AUTO_INCREMENT,
 	 username VARCHAR(255),
 	 secret BINARY(255),
-	 cookieSession VARCHAR(255),
-	 PRIMARY KEY (username)
+	 cookiesession VARCHAR(255),
+	 PRIMARY KEY (id)
  	 );`,
 }
 
@@ -35,15 +35,9 @@ var createDBstmt = []string{
 func registerDB() (*sql.DB, error) {
 	dbLog(fmt.Sprintf("mysql.go: registerDB()"))
 	// retries give time for docker-compose and mysql to finish setup.
-	for retries := 0; retries < 70; retries++ {
-		db, err = sql.Open("mysql", dbLogIn)
-		if err != nil {
-			dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open error: retry count: %v", retries))
-			time.Sleep(time.Second * 10)
-			if retries > 69 {
-				return db, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
-			}
-		}
+	db, err = sql.Open("mysql", dbLogIn)
+	if err != nil {
+		return nil, fmt.Errorf("mysql.go: registerDB(): sql.Open db: %v: err: %v", db, err)
 	}
 	dbLog(fmt.Sprintf("mysql.go: registerDB(): sql.Open success: db: %v", db))
 	return db, nil
@@ -97,30 +91,13 @@ func createDB(db *sql.DB) error {
 	return nil
 }
 
-// viewDBEvents()_ returns events assigned to the current user.
-func viewDBEvents(db *sql.DB) {
-	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var db: %v", db))
-	rows, err := db.Query(`SELECT * FROM events`)
-	if err != nil {
-		log.Println(err)
-		//return nil, fmt.Errorf("mysql.go: viewEvents(): rows = %v: error: %v", rows, err)
-	}
-	defer rows.Close()
-
-	for rows.Next() {
-		log.Println("rows", rows)
-	}
-
-	dbLog(fmt.Sprintf("mysql.go: viewDBEvents(): var rows: %v", rows))
-}
-
 // createDemoDB() add the demo events and user to the db.
 func createDemoDB(db *sql.DB) {
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var db: %v", db))
 	// Range over each of the demoEvents and insert them in to the db.
 	for _, demo := range demoEvents {
 		// Prepare stmt.
-		insertDemoEvent, err := db.Prepare("INSERT INTO events (id, name, starttime, endtime, description, createdby) VALUES(?, ?, ?, ?, ?, ?)")
+		insertDemoEvent, err := db.Prepare("INSERT INTO events (id, name, starttime, endtime, description, username) VALUES(?, ?, ?, ?, ?, ?)")
 		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): insertDemoEvent: %v", insertDemoEvent))
 		// Insert demo event into db.
 		results, err := insertDemoEvent.Exec(demo.ID, demo.Name, demo.StartTime, demo.EndTime, demo.Description, demo.Description)
@@ -139,7 +116,7 @@ func createDemoDB(db *sql.DB) {
 	if err != nil {
 		log.Panicf("mysql.go: createDemoDB(): error encrypting demo password secret: %v: error: %v", secret, err)
 	}
-	sLog(fmt.Sprintf("auth.go: registerUser(): encrypt password: %v", secret))
+	sLog(fmt.Sprintf("mysql.go: createDemoDB(): encrypted password: %v", secret))
 	// Insert user into db.
 	results, err := insertDemoUser.Exec(demoUser.Username, secret)
 	if err != nil {
@@ -163,26 +140,27 @@ func scanEvent(eventScan eventScanner) (*Event, error) {
 		startTime   sql.NullString
 		endTime     sql.NullString
 		description sql.NullString
-		createdBy   sql.NullString
+		userID      int64
 	)
-	if err := eventScan.Scan(&name, &starTime, &endTime, &description, &createdBy); err != nil {
+	if err := eventScan.Scan(&id, &name, &startTime, &endTime, &description, &userID); err != nil {
 		return nil, fmt.Errorf("mysql.go: scanEvent(): eventScan.Scan(): error: %v", err)
 	}
 	event := &Event{
 		ID:          id,
-		Name:        event.String,
+		Name:        name.String,
 		StartTime:   startTime.String,
 		EndTime:     endTime.String,
 		Description: description.String,
-		CreatedBy:   createdBy.String,
+		UserID:      userID,
 	}
 	dbLog(fmt.Sprintf("mysql.go: scanEvent(): event scan success: %v", event))
 	return event, nil
 }
 
 func listEvents(db *sql.DB, username string) ([]*Event, error) {
-	dbLog("mysql.go: listEvents()")
-	rows, err := db.Query("SELECT * FROM events WHERE username =? ORDER BY startTime", username)
+	dbLog(fmt.Sprintf("mysql.go: listEvents(): username: %v", username))
+	//rows, err := db.Query("SELECT * FROM events WHERE username = ?", username)
+	rows, err := db.Query("SELECT * FROM events")
 	if err != nil {
 		return nil, fmt.Errorf("mysql.go: listEvents(): db.Query(): error: %v", err)
 	}
@@ -191,6 +169,7 @@ func listEvents(db *sql.DB, username string) ([]*Event, error) {
 
 	var events []*Event
 	for rows.Next() {
+		dbLog(fmt.Sprintf("mysql.go: rows.Next() inside loop: rows: %v", rows))
 		event, err := scanEvent(rows)
 		if err != nil {
 			return nil, fmt.Errorf("mysql.go: listEvents(): rows.Next(): error: %v", err)
@@ -198,5 +177,6 @@ func listEvents(db *sql.DB, username string) ([]*Event, error) {
 		dbLog(fmt.Sprintf("mysql.go: listEvents() rows.Next(): appending event: %v", event))
 		events = append(events, event)
 	}
+	dbLog(fmt.Sprintf("mysql.go: rows.Next() success: events: %v", events))
 	return events, nil
 }

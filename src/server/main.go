@@ -21,11 +21,23 @@ var db *sql.DB
 
 func main() {
 	// Register credentials for database with registerDB().
-	db, err = registerDB()
-	if err != nil {
-		log.Panicf("main.go: main(): call to registerDB(): error: %v", err)
+	// For loop tries every 10 seconds 6 times before failure.
+	// Check if the database exists isDB().
+	for retries := 0; retries < 70; retries++ {
+		db, err = registerDB()
+		if err != nil {
+			dbLog(fmt.Sprintf("main.go: call to registerDB(): waiting for db to be ready: retry: %v", retries))
+			time.Sleep(time.Second * 10)
+			if retries > 69 {
+				log.Panicf("main.go: call to registerDB(): could not open db: db: %v: err: %v", db, err)
+			}
+			sLog(fmt.Sprintf("main.go: main(): registerDB(): db: %v", db))
+		} else {
+			dbLog(fmt.Sprintf("main.go: call to registerDB(): success: no of retries: %v", retries))
+			retries = 71
+		}
+
 	}
-	sLog(fmt.Sprintf("main.go: main(): db.register(): db: %v", db))
 
 	// For loop tries every 10 seconds 6 times before failure.
 	// Check if the database exists isDB().
@@ -43,11 +55,6 @@ func main() {
 		}
 
 	}
-
-	// Try to add events.
-	//addDBEvent(db)
-	// Try to view events.
-	viewDBEvents(db)
 
 	// Create demo database entries.
 	createDemoDB(db)
@@ -180,13 +187,21 @@ func registerHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: viewEventsHandler()")
 	var user *User
+	var events []*Event
 	var err error
 	// Check for an existing session.
 	user, err = verifySession(db, r)
 	if err != nil {
 		log.Printf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err)
 		http.Redirect(w, r, "/login", http.StatusFound)
+		return nil
 	}
+	events, err = listEvents(db, user.Username)
+	if err != nil {
+		p := &PageData{PageName: "View Events", Message: fmt.Sprintf("No Events to view: %v", err)}
+		return viewEvents.runTemplate(w, r, p)
+	}
+	log.Printf("main.go: viewEventsHandler(): events from listEvents: %v", events)
 	log.Printf("main.go: viewEventsHandler(): user: %v", user)
 	p := &PageData{PageName: "View Events"}
 	sLog("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")

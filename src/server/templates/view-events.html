@@ -1,6 +1,7 @@
         <!-- event data start -->
         <div class="col-12 col-md-10">
           <div class="card-deck">
+            {{if .Events}}
             {{range .Events}}
             <div class="card bg-inverse card-outline-primary">
               <div class="card-block">
@@ -24,9 +25,11 @@
             </div>
             <!-- card end -->
             {{else}}
+            <p class="text-primary">{{.Message}}</p>
+            {{end}}
             <p>No events found.</p>
             {{end}}
-            <p>{{.Message}}</p>
+            <p class="text-primary">{{.Message}}</p>
           </div>
           <!-- card-deck end -->
         </div>

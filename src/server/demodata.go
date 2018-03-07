@@ -14,7 +14,7 @@ var demoEvent1 = &Event{
 	StartTime:   "2018-02-28 19:00",
 	EndTime:     "2018-02-28 20:00",
 	Description: "Create demo events using time.Now() and time.Add() to create events that start from the time the app is run for the first time.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent2 = &Event{
@@ -23,7 +23,7 @@ var demoEvent2 = &Event{
 	StartTime:   "2018-02-28 22:00",
 	EndTime:     "2018-02-28 23:50",
 	Description: "Once demo events are added to the db test CRUD functionality with db stmts.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent3 = &Event{
@@ -32,7 +32,7 @@ var demoEvent3 = &Event{
 	StartTime:   "2018-03-01 12:00",
 	EndTime:     "2018-03-01 13:00",
 	Description: "Add docker-compose to start mysql and app with one command.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent4 = &Event{
@@ -41,7 +41,7 @@ var demoEvent4 = &Event{
 	StartTime:   "2018-03-02 12:00",
 	EndTime:     "2018-03-02 01:00",
 	Description: "GRPC app will have front end javascript.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent5 = &Event{
@@ -50,7 +50,7 @@ var demoEvent5 = &Event{
 	StartTime:   "2018-03-06 05:00",
 	EndTime:     "2018-03-06 08:00",
 	Description: "App should use Nginx and UWSGI.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent6 = &Event{
@@ -59,7 +59,7 @@ var demoEvent6 = &Event{
 	StartTime:   "2018-03-10 15:00",
 	EndTime:     "2018-03-10 18:00",
 	Description: "Publish website.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent7 = &Event{
@@ -68,7 +68,7 @@ var demoEvent7 = &Event{
 	StartTime:   "2018-03-11 13:00",
 	EndTime:     "2018-03-11 19:00",
 	Description: "Collect links to all work and publish on social media.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent8 = &Event{
@@ -77,7 +77,7 @@ var demoEvent8 = &Event{
 	StartTime:   "2018-03-11 02:00",
 	EndTime:     "2018-03-11 06:00",
 	Description: "Update resume to contain all of the latest work and skills.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent9 = &Event{
@@ -86,7 +86,7 @@ var demoEvent9 = &Event{
 	StartTime:   "2018-02-12 04:00",
 	EndTime:     "2018-02-12 12:00",
 	Description: "Apply for attractive positions using newly finished portfolio.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }
 
 var demoEvent10 = &Event{
@@ -95,5 +95,5 @@ var demoEvent10 = &Event{
 	StartTime:   "2018-04-01 13:00",
 	EndTime:     "2018-04-01 17:00",
 	Description: "Programming, coding, configuring, learning, expanding, growing.",
-	CreatedBy:   "demo",
+	UserID:   1,
 }

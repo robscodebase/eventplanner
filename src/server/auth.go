@@ -35,7 +35,7 @@ func userLogin(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, *Use
 
 	// Once password and username are matched serve cookie.
 	user = &User{Username: username, Secret: enteredPassword, CookieSession: serveCookie(w, r)}
-	err = storeSession(db, user)
+	err = storeSession(db, user, "login")
 	if err != nil {
 		sLog(fmt.Sprintf("auth.go: userLogin(): call to storeSession error: %v", err))
 		return "userExists", nil, nil
@@ -78,7 +78,7 @@ func registerUser(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, *
 	// is delivered.
 	sLog(fmt.Sprintf("auth.go: registerUser(): username: %v", username))
 	user.CookieSession = serveCookie(w, r)
-	err = storeSession(db, user)
+	err = storeSession(db, user, "register")
 	if err != nil {
 		sLog(fmt.Sprintf("auth.go: registerUser(): call to storeSession error: %v", err))
 		return "userExists", nil, nil
@@ -89,24 +89,42 @@ func registerUser(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, *
 }
 
 // storeSession() takes a cookie value and stores it to the user database.
-func storeSession(db *sql.DB, user *User) error {
+func storeSession(db *sql.DB, user *User, status string) error {
+	sLog(fmt.Sprintf("auth.go: storeSession(): user: %v", user))
 	// After creating the cookie session data
 	// the requested password is encrypted using bcrypt.
 	user.Secret, err = bcrypt.GenerateFromPassword(user.Secret, bcrypt.DefaultCost)
 	if err != nil {
-		return fmt.Errorf("auth.go: registerUser(): error encrypting password secret: %v: error: %v", user.Secret, err)
+		return fmt.Errorf("auth.go: storeSession(): error encrypting password secret: %v: error: %v", user.Secret, err)
 	}
-	sLog(fmt.Sprintf("auth.go: registerUser(): encrypt password: %v", user.Secret))
+	sLog(fmt.Sprintf("auth.go: storeSession(): encrypt password: %v", user.Secret))
 	// Prepare the db insert statement for the new user.
-	registerStmt, err := db.Prepare("INSERT users SET username=?,secret=?,cookieSession=?")
-	if err != nil {
-		return fmt.Errorf("auth.go: registerUser(): registerStmt: %v: error: %v", registerStmt, err)
+	if status == "register" {
+		registerStmt, err := db.Prepare("INSERT users SET username=?,secret=?,cookieSession=?")
+		if err != nil {
+			return fmt.Errorf("auth.go: storSession(): registerStmt: %v: error: %v", registerStmt, err)
+		}
+		sLog(fmt.Sprintf("auth.go: storSession(): registerStmt(): db.Prepare(): registerStmt: %v", registerStmt))
+		// Execute the db insert statement for the new user.
+		regExec, err := registerStmt.Exec(user.Username, user.Secret, user.CookieSession)
+		sLog(fmt.Sprintf("auth.go: storSession(): registerStmt.Exec():  %v", regExec))
+		if err != nil {
+			return fmt.Errorf("auth.go: storSession(): registerUser(): storeSession(): error executing registerStmt: %v: error: %v", registerStmt, err)
+		}
 	}
+	loginStmt, err := db.Prepare("UPDATE users SET cookieSession=? WHERE username=?")
+	if err != nil {
+		return fmt.Errorf("auth.go: storSession(): loginStmt: %v: error: %v", loginStmt, err)
+	}
+	sLog(fmt.Sprintf("auth.go: storSession(): loginStmt(): db.Prepare(): registerStmt: %v", loginStmt))
 	// Execute the db insert statement for the new user.
-	_, err = registerStmt.Exec(user.Username, user.Secret, user.CookieSession)
+	loginExec, err := loginStmt.Exec(user.CookieSession, user.Username)
+	sLog(fmt.Sprintf("auth.go: storSession(): loginStmt.Exec():  %v", loginExec))
 	if err != nil {
-		return fmt.Errorf("auth.go: registerUser(): storeSession(): error executing registerStmt: %v: error: %v", registerStmt, err)
+		return fmt.Errorf("auth.go: storSession(): registerUser(): storeSession(): error executing loginStmt: %v: error: %v", loginStmt, err)
 	}
+
+	sLog(fmt.Sprintf("auth.go: storSession(): loginStmt.Exec():  %v", loginExec))
 	return nil
 }
 

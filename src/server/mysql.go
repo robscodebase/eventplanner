@@ -148,3 +148,55 @@ func createDemoDB(db *sql.DB) {
 	}
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var results: %v", results))
 }
+
+// rowScanner is implemented by sql.Row and sql.Rows
+type eventScanner interface {
+	Scan(scanTo ...interface{}) error
+}
+
+// scanEvents reads an event from a sql.Row or sql.Rows
+func scanEvent(eventScan eventScanner) (*Event, error) {
+	dbLog(fmt.Sprintf("mysql.go: scanEvent(): eventScan: %v", eventScan))
+	var (
+		id          int64
+		name        sql.NullString
+		startTime   sql.NullString
+		endTime     sql.NullString
+		description sql.NullString
+		createdBy   sql.NullString
+	)
+	if err := eventScan.Scan(&name, &starTime, &endTime, &description, &createdBy); err != nil {
+		return nil, fmt.Errorf("mysql.go: scanEvent(): eventScan.Scan(): error: %v", err)
+	}
+	event := &Event{
+		ID:          id,
+		Name:        event.String,
+		StartTime:   startTime.String,
+		EndTime:     endTime.String,
+		Description: description.String,
+		CreatedBy:   createdBy.String,
+	}
+	dbLog(fmt.Sprintf("mysql.go: scanEvent(): event scan success: %v", event))
+	return event, nil
+}
+
+func listEvents(db *sql.DB, username string) ([]*Event, error) {
+	dbLog("mysql.go: listEvents()")
+	rows, err := db.Query("SELECT * FROM events WHERE username =? ORDER BY startTime", username)
+	if err != nil {
+		return nil, fmt.Errorf("mysql.go: listEvents(): db.Query(): error: %v", err)
+	}
+	dbLog(fmt.Sprintf("mysql.go: listEvents() db.Query() success: rows: %v", rows))
+	defer rows.Close()
+
+	var events []*Event
+	for rows.Next() {
+		event, err := scanEvent(rows)
+		if err != nil {
+			return nil, fmt.Errorf("mysql.go: listEvents(): rows.Next(): error: %v", err)
+		}
+		dbLog(fmt.Sprintf("mysql.go: listEvents() rows.Next(): appending event: %v", event))
+		events = append(events, event)
+	}
+	return events, nil
+}

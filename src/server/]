@@ -9,7 +9,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -98,11 +97,11 @@ func runHandlers() {
 	r.Methods("GET").Path("/add-event").
 		Handler(errorCheck(addEventHandler))
 
-	r.Methods("GET").Path("/edit-event/{id:[0-9]+}").
+	r.Methods("GET").Path("/edit-event").
 		Handler(errorCheck(editEventHandler))
 
 	// Post methods.
-	r.Methods("POST").Path("/edit-event/{id:[0-9]+}").
+	r.Methods("POST").Path("/edit-event").
 		Handler(errorCheck(editEventHandler))
 
 	r.Methods("POST").Path("/register").
@@ -229,37 +228,24 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 // editEventHandler() serves the HTML page for edit-event.html.
 func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	sLog("main.go: main(): runHandlers(): editEventHandler()")
 	var user *User
 	// Check for an existing session.
 	user, err = verifySession(db, r)
 	if err != nil {
-		sLog(fmt.Sprintf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err))
+		log.Printf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err)
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return nil
 	}
-	eventID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
-	if err != nil {
-		sLog(fmt.Sprintf("main.go: main(): runHandlers(): editEventHandler(): strconv.ParseInt(): err", err))
-		http.Redirect(w, r, "/view-events", http.StatusFound)
-		return nil
-	}
-	sLog(fmt.Sprintf("main.go: viewEventsHandler(): user: %v: eventID: %v", user, eventID))
-	//var (
-	//name        string
-	//starttime   string
-	//endtime     string
-	//description string
-	//userID      int64
-	//)
-	//err = db.QueryRow("UPDATE events SET name, starttime, endtime, description, userid WHERE id = ?", eventID).Scan(&name, &starttime, &endtime, &description, &userID)
-	//if err != nil {
-	//sLog(fmt.Sprintf("main.go: main(): runHandlers(): editEventHandler(): db.QueryRow(): err", err))
-	//http.Redirect(w, r, "/view-events", http.StatusFound)
-	//return nil
-	//}
-	sLog("main.go: viewEventsHandler(): db.QueryRow: event found:")
+	editEvent()
+		id, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+			if err != nil {
+						event.Error = "Invalid Number."
+								tmpl.ExecuteTemplate(w, "addeditevent", event)
+										return
+									}
+	log.Println("user", user)
 	p := &PageData{PageName: "Edit Event"}
+	sLog("main.go: main(): runHandlers(): editEventsHandler(). call to handler")
 	return editEvent.runTemplate(w, r, p)
 }
 

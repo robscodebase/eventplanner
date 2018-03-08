@@ -180,3 +180,12 @@ func listEvents(db *sql.DB, username string) ([]*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: rows.Next() success: events: %v", events))
 	return events, nil
 }
+
+func listEvent(db *sql.DB, eventID int64) (*Event, error) {
+	dbLog(fmt.Sprintf("mysql.go: listEvent() eventID: %v", eventID))
+	event, err := scanEvent(db.QueryRow("SELECT * FROM events WHERE id = ?", eventID))
+	if err != nil {
+		return nil, fmt.Errorf("mysql.go: listEvent(): error getting event: %v: err: %v: eventID: %v", event, err, eventID)
+	}
+	return event, nil
+}

@@ -155,7 +155,9 @@ func serveCookie(w http.ResponseWriter, r *http.Request) string {
 // the user is redirected to the login page.
 func verifySession(db *sql.DB, r *http.Request) (*User, error) {
 	sLog(fmt.Sprintf("auth.go: verifySession(): db: %v", db))
-	var username string
+	var username, cookieS string
+	var secret []byte
+	var userID int64
 	var user *User
 	// Read the cookie from the user.
 	// If no cookie is found the user
@@ -167,13 +169,14 @@ func verifySession(db *sql.DB, r *http.Request) (*User, error) {
 	}
 	sLog(fmt.Sprintf("auth.go: verifySession(): found cookie: %v", cookie))
 	// If a cookie was found, retrieve the user data and return user.
-	err = db.QueryRow("SELECT username FROM users WHERE cookieSession=?", cookie.Value).Scan(&username)
+	err = db.QueryRow("SELECT * FROM users WHERE cookieSession=?", cookie.Value).Scan(&userID, &username, &secret, &cookieS)
 	if err != nil {
 		// Could not find cookie match.
 		sLog(fmt.Sprintf("auth.go: verifySession(): db.QueryRow(): fail: %v", err))
 		return nil, fmt.Errorf("auth.go: verifySession(): db.QueryRow(): cookie not found in db error: %v", err)
 	}
-	user = &User{Username: username, CookieSession: cookie.Value}
+	dbLog(fmt.Sprintf("auth.go: verifySession(): succesful db.QueryRow(): id: %v, username: %v, secret: %T, cookies: %v", userID, username, secret, cookie))
+	user = &User{ID: userID, Username: username, CookieSession: cookie.Value}
 	sLog(fmt.Sprintf("auth.go: verifySession(): success: user: %v", user))
 	return user, nil
 }

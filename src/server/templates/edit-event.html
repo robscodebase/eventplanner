@@ -1,17 +1,17 @@
         <div class="col-md-10">
           <div class="card bg-inverse text-light card-outline-primary">
             <div class="container">
-              <form>
+              <form method="POST" action="/update-event/{{.Event.ID}}">
                 <div class="form-group bg-inverse">
-                  <label for="formGroupExampleInput" class="text-white">Name</label>
-                  <input type="text" class="form-control" id="formGroupExampleInput">
+                  <label for="formGroupInput" class="text-white">Name</label>
+                  <input name="name" type="text" class="form-control" id="formGroupInput" value="{{.Event.Name}}">
                 </div>
                 <!-- form-group end -->
                 <div class="row">
                   <div class="col-12 col-sm-6">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="start-time-picker" class="text-white">Start</label>
-                      <input class="time-picker form-control" id="start-time">
+                      <input name="startTime" class="time-picker form-control" id="start-time" value="{{.Event.StartTime}}">
                     </div>
                     <!-- form-group end -->
                   </div>
@@ -19,7 +19,7 @@
                   <div class="col-12 col-sm-6">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="end-time-picker" class="text-white">End</label>
-                      <input class="time-picker form-control" id="end-time">
+                      <input name="endTime" class="time-picker form-control" id="end-time" value="{{.Event.EndTime}}">
                     </div>
                   </div>
                   <!-- column end -->
@@ -27,11 +27,9 @@
                 <!-- row end -->
                 <div class="form-group">
                   <label for="event-description-text-area" class="text-white">Description</label>
-                  <textarea class="form-control" id="event-description-text-area" rows="5"></textarea>
+                  <textarea name="description" class="form-control" id="event-description-text-area" rows="5">{{.Event.Description}}</textarea>
                 </div>
                 <!-- form-group end -->
-              </form>
-              <!-- form end -->
             </div>
             <!-- container end -->
           </div>
@@ -42,15 +40,17 @@
       <!-- row end -->
       <div class="row">
         <div class="col-12 offset-md-2 col-sm-6 col-md-5" style="padding-top:10px;">
-            <button type="submit" class="btn btn-primary w-100">Submit</button>
+            <button type="submit" class="btn btn-primary w-100" value="Update">Update</button>
         </div>
         <!-- column end -->
         <div class="col-12 col-sm-6 col-md-5" style="padding-top:10px;">
-          <button type="submit" class="btn btn-danger float-sm-right w-100" >Delete</button>
+            <a href="delete/{{.Event.ID}}"><button type="submit" class="btn btn-danger float-sm-right w-100" >Delete</button></a>
       </div>
       <!-- column end -->
     </div>
     <!-- row end -->
+              </form>
+              <!-- form end -->
     </div>
     <!-- container end -->
     <script src="https://code.jquery.com/jquery-3.1.1.slim.min.js" integrity="sha384-A7FZj7v+d/sdmMqp/nOQwliLvUsJfDHW+k9Omg/a/EheAdgtzNs3hpfag6Ed950n" crossorigin="anonymous"></script>

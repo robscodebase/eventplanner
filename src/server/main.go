@@ -101,9 +101,8 @@ func runHandlers() {
 	r.Methods("GET").Path("/edit-event/{id:[0-9]+}").
 		Handler(errorCheck(editEventHandler))
 
-	// Post methods.
-	r.Methods("POST").Path("/edit-event/{id:[0-9]+}").
-		Handler(errorCheck(editEventHandler))
+	r.Methods("POST").Path("/update-event/{id:[0-9]+}").
+		Handler(errorCheck(updateEventHandler))
 
 	r.Methods("POST").Path("/register").
 		Handler(errorCheck(registerHandler))
@@ -210,7 +209,7 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	log.Printf("main.go: viewEventsHandler(): events from listEvents: %v", events)
 	log.Printf("main.go: viewEventsHandler(): user: %v", user)
 	p := &PageData{Events: events, PageName: "View Events"}
-	sLog("main.go: main(): runHandlers(): viewEventsHandler() call to handler.")
+	sLog("main.go: main():  viewEventsHandler() call to handler.")
 	return viewEvents.runTemplate(w, r, p)
 }
 
@@ -223,44 +222,71 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	}
 	log.Println("user", user)
 	p := &PageData{PageName: "Add Event"}
-	sLog("main.go: main(): runHandlers(): addEventsHandler(). call to handler")
+	sLog("main.go: main():  addEventsHandler(). call to handler")
 	return addEvent.runTemplate(w, r, p)
 }
 
 // editEventHandler() serves the HTML page for edit-event.html.
 func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
-	sLog("main.go: main(): runHandlers(): editEventHandler()")
+	sLog("main.go: main():  editEventHandler()")
 	var user *User
 	// Check for an existing session.
 	user, err = verifySession(db, r)
 	if err != nil {
-		sLog(fmt.Sprintf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err))
+		sLog(fmt.Sprintf("main.go: editEventHandler(): error: %v: redirecting to login page:", err))
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return nil
+	}
+	sLog("main.go: editEventHandler(): db.QueryRow: event found:")
+	eventID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: main():  editEventHandler(): strconv.ParseInt(): err: %v: redirecting to view-events page:", err))
+		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
+	}
+	sLog(fmt.Sprintf("main.go: editEventHandler(): user: %v: eventID: %v", user, eventID))
+	event, err := listEvent(db, user.ID, eventID)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: editEventHandler(): call to listEvent(): error: %v: redirecting to view-events page:", err))
+		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
+	}
+	p := &PageData{PageName: "Edit Event", Event: event}
+	return editEvent.runTemplate(w, r, p)
+}
+
+func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	sLog("main.go: main():  updateEventHandler():")
+	var user *User
+	// Check for an existing session.
+	user, err = verifySession(db, r)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: updateEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return nil
 	}
 	eventID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
 	if err != nil {
-		sLog(fmt.Sprintf("main.go: main(): runHandlers(): editEventHandler(): strconv.ParseInt(): err", err))
+		sLog(fmt.Sprintf("main.go: main():  updateEventHandler(): strconv.ParseInt(): err: %v: redirecting to view-events page:", err))
 		http.Redirect(w, r, "/view-events", http.StatusFound)
 		return nil
 	}
-	sLog(fmt.Sprintf("main.go: viewEventsHandler(): user: %v: eventID: %v", user, eventID))
-	//var (
-	//name        string
-	//starttime   string
-	//endtime     string
-	//description string
-	//userID      int64
-	//)
-	//err = db.QueryRow("UPDATE events SET name, starttime, endtime, description, userid WHERE id = ?", eventID).Scan(&name, &starttime, &endtime, &description, &userID)
-	//if err != nil {
-	//sLog(fmt.Sprintf("main.go: main(): runHandlers(): editEventHandler(): db.QueryRow(): err", err))
-	//http.Redirect(w, r, "/view-events", http.StatusFound)
-	//return nil
-	//}
-	sLog("main.go: viewEventsHandler(): db.QueryRow: event found:")
-	p := &PageData{PageName: "Edit Event"}
-	return editEvent.runTemplate(w, r, p)
+	event := &Event{
+		ID:          eventID,
+		Name:        r.FormValue("name"),
+		StartTime:   r.FormValue("startTime"),
+		EndTime:     r.FormValue("endTime"),
+		Description: r.FormValue("description"),
+		UserID:      user.ID,
+	}
+	err = updateEvent(db, event)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: main():  updateEventHandler(): updateEvent(): err: %v: redirecting to view-events page:", err))
+		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
+	}
+	http.Redirect(w, r, "/edit-event/"+mux.Vars(r)["id"], http.StatusFound)
+	return nil
 }
 
 // logoutHandler sets the cookie to die immediately and

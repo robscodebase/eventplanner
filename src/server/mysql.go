@@ -181,11 +181,27 @@ func listEvents(db *sql.DB, username string) ([]*Event, error) {
 	return events, nil
 }
 
-func listEvent(db *sql.DB, eventID int64) (*Event, error) {
+func listEvent(db *sql.DB, userID, eventID int64) (*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: listEvent() eventID: %v", eventID))
-	event, err := scanEvent(db.QueryRow("SELECT * FROM events WHERE id = ?", eventID))
+	event, err := scanEvent(db.QueryRow("SELECT * FROM events WHERE id = ? AND userid = ?", eventID, userID))
 	if err != nil {
 		return nil, fmt.Errorf("mysql.go: listEvent(): error getting event: %v: err: %v: eventID: %v", event, err, eventID)
 	}
 	return event, nil
+}
+
+func updateEvent(db *sql.DB, event *Event) error {
+	dbLog(fmt.Sprintf("mysql.go: updateEvent() eventID: %v", event.ID))
+	// Prepare insert stmt.
+	updateDBEvent, err := db.Prepare("UPDATE events SET name=?, starttime=?, endtime=?, description=?  WHERE id=? AND userid=?")
+	dbLog("mysql.go: updateEvent() db.Prepare() complete")
+	// Insert demo event into db.
+	dbLog(fmt.Sprintf("mysql.go: updateEvent() event.ID: %v, event.Name %v, event.StartTime %v, event.EndTime %v, event.Description %v, event.UserID %v",
+		event.ID, event.Name, event.StartTime, event.EndTime, event.Description, event.UserID))
+	results, err := updateDBEvent.Exec(event.Name, event.StartTime, event.EndTime, event.Description, event.ID, event.UserID)
+	if err != nil {
+		return fmt.Errorf("mysql.go: updateEvent(): problem updating db could be wrong userid: error: %v, userID: %v", err, event.UserID)
+	}
+	dbLog(fmt.Sprintf("mysql.go: updateEvent(): insertDemoEvent success: results: %v", results))
+	return nil
 }

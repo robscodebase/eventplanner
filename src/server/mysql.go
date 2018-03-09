@@ -202,6 +202,21 @@ func updateEvent(db *sql.DB, event *Event) error {
 	if err != nil {
 		return fmt.Errorf("mysql.go: updateEvent(): problem updating db could be wrong userid: error: %v, userID: %v", err, event.UserID)
 	}
-	dbLog(fmt.Sprintf("mysql.go: updateEvent(): insertDemoEvent success: results: %v", results))
+	dbLog(fmt.Sprintf("mysql.go: updateEvent(): success: results: %v", results))
+	return nil
+}
+
+func deleteEvent(db *sql.DB, id, userID int64) error {
+	dbLog(fmt.Sprintf("mysql.go: deleteEvent() id: %v, userID: %v", id, userID))
+	// Prepare delete stmt.
+	deleteDBEvent, err := db.Prepare("DELETE FROM events WHERE id=? AND userid=?")
+	dbLog("mysql.go: updateEvent() db.Prepare() complete")
+	// Insert demo event into db.
+	dbLog(fmt.Sprintf("mysql.go: updateEvent(): id: %v, userID %v", id, userID))
+	results, err := deleteDBEvent.Exec(id, userID)
+	if err != nil {
+		return fmt.Errorf("mysql.go: deleteEvent(): problem deleting db could be wrong userid: error: %v, userID: %v", err, userID)
+	}
+	dbLog(fmt.Sprintf("mysql.go: deleteEvent(): success: results: %v", results))
 	return nil
 }

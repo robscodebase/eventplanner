@@ -104,6 +104,9 @@ func runHandlers() {
 	r.Methods("POST").Path("/update-event/{id:[0-9]+}").
 		Handler(errorCheck(updateEventHandler))
 
+	r.Methods("POST").Path("/delete-event/{id:[0-9]+}").
+		Handler(errorCheck(deleteEventHandler))
+
 	r.Methods("POST").Path("/register").
 		Handler(errorCheck(registerHandler))
 
@@ -286,6 +289,32 @@ func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 		return nil
 	}
 	http.Redirect(w, r, "/edit-event/"+mux.Vars(r)["id"], http.StatusFound)
+	return nil
+}
+
+func deleteEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	sLog("main.go: main():  deleteEventHandler():")
+	var user *User
+	// Check for an existing session.
+	user, err = verifySession(db, r)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: deleteEventHandler(): error: %v: redirecting to login page:", err))
+		http.Redirect(w, r, "/login", http.StatusFound)
+		return nil
+	}
+	eventID, err := strconv.ParseInt(mux.Vars(r)["id"], 10, 64)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: main():  deleteEventHandler(): strconv.ParseInt(): err: %v: redirecting to view-events page:", err))
+		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
+	}
+	err = deleteEvent(db, eventID, user.ID)
+	if err != nil {
+		sLog(fmt.Sprintf("main.go: main():  updateEventHandler(): deleteEvent(): err: %v: redirecting to view-events page:", err))
+		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
+	}
+	http.Redirect(w, r, "/view-events", http.StatusFound)
 	return nil
 }
 

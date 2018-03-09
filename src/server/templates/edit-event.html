@@ -1,7 +1,7 @@
         <div class="col-md-10">
           <div class="card bg-inverse text-light card-outline-primary">
             <div class="container">
-              <form method="POST" action="/update-event/{{.Event.ID}}">
+                <form method="POST" action="/update-event/{{.Event.ID}}">
                 <div class="form-group bg-inverse">
                   <label for="formGroupInput" class="text-white">Name</label>
                   <input name="name" type="text" class="form-control" id="formGroupInput" value="{{.Event.Name}}">
@@ -40,11 +40,11 @@
       <!-- row end -->
       <div class="row">
         <div class="col-12 offset-md-2 col-sm-6 col-md-5" style="padding-top:10px;">
-            <button type="submit" class="btn btn-primary w-100" value="Update">Update</button>
+            <button type="submit" class="btn btn-primary w-100" value="update">Update</button>
         </div>
         <!-- column end -->
         <div class="col-12 col-sm-6 col-md-5" style="padding-top:10px;">
-            <a href="delete/{{.Event.ID}}"><button type="submit" class="btn btn-danger float-sm-right w-100" >Delete</button></a>
+            <button type="submit" formaction="/delete-event/{{.Event.ID}}" class="btn btn-danger float-sm-right w-100" >Delete</button></a>
       </div>
       <!-- column end -->
     </div>

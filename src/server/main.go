@@ -101,6 +101,12 @@ func runHandlers() {
 	r.Methods("GET").Path("/edit-event/{id:[0-9]+}").
 		Handler(errorCheck(editEventHandler))
 
+	r.Methods("GET").Path("/delete-event/{id:[0-9]+}").
+		Handler(errorCheck(deleteEventHandler))
+
+	r.Methods("POST").Path("/add-event").
+		Handler(errorCheck(addEventHandler))
+
 	r.Methods("POST").Path("/update-event/{id:[0-9]+}").
 		Handler(errorCheck(updateEventHandler))
 
@@ -218,14 +224,31 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 // addEventHandler() serves the HTML page for add-event.html.
 func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
+	sLog("main.go: main():  addEventHandler()")
 	var user *User
 	user, err = verifySession(db, r)
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
-	log.Println("user", user)
+	if r.Method == "POST" {
+		event := &Event{
+			Name:        r.FormValue("name"),
+			StartTime:   r.FormValue("startTime"),
+			EndTime:     r.FormValue("endTime"),
+			Description: r.FormValue("description"),
+			UserID:      user.ID,
+		}
+		err = addEventDB(db, event)
+		if err != nil {
+			sLog(fmt.Sprintf("main.go: main():  addEventHandler(): addEvent(): err: %v: redirecting to add-event page:", err))
+			http.Redirect(w, r, "/add-event", http.StatusFound)
+			return nil
+		}
+		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
+	}
 	p := &PageData{PageName: "Add Event"}
-	sLog("main.go: main():  addEventsHandler(). call to handler")
+	sLog("main.go: main():  addEventsHandler(): call to handler")
 	return addEvent.runTemplate(w, r, p)
 }
 

@@ -1,17 +1,17 @@
         <div class="col-md-10">
           <div class="card bg-inverse text-light card-outline-primary">
             <div class="container">
-              <form>
+              <form method="POST" action="/add-event"> 
                 <div class="form-group bg-inverse">
-                  <label for="formGroupExampleInput" class="text-white">Name</label>
-                  <input type="text" class="form-control" id="formGroupExampleInput">
+                  <label for="formGroupInput" class="text-white">Name</label>
+                  <input type="text" class="form-control" name="name" id="formGroupInput">
                 </div>
                 <!-- form-group end -->
                 <div class="row">
                   <div class="col-12 col-sm-6">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="start-time-picker" class="text-white">Start</label>
-                      <input type="text" class="form-control" id="start-time-picker">
+                      <input type="text" class="form-control" name="startTime" id="start-time-picker">
                     </div>
                     <!-- form-group end -->
                   </div>
@@ -19,7 +19,7 @@
                   <div class="col-12 col-sm-6">
                     <div class="form-group bg-inverse form-group-inline">
                       <label for="end-time-picker" class="text-white">End</label>
-                      <input type="text" class="form-control" id="end-time-picker">
+                      <input type="text" class="form-control" name="endTime" id="end-time-picker">
                     </div>
                   </div>
                   <!-- column end -->
@@ -27,11 +27,9 @@
                 <!-- row end -->
                 <div class="form-group">
                   <label for="event-description-text-area" class="text-white">Description</label>
-                  <textarea class="form-control" id="event-description-text-area" rows="5"></textarea>
+                  <textarea class="form-control" id="event-description-text-area" name="description" rows="5"></textarea>
                 </div>
                 <!-- form-group end -->
-              </form>
-              <!-- form end -->
             </div>
             <!-- container end -->
           </div>
@@ -41,16 +39,14 @@
       </div>
       <!-- row end -->
       <div class="row">
-        <div class="col-12 offset-md-2 col-sm-6 col-md-5" style="padding-top:10px;">
+        <div class="col-12 col-md-10 offset-md-2" style="padding-top:10px;">
           <button type="submit" class="btn btn-primary w-100">Submit</button>
-        </div>
-        <!-- column end -->
-        <div class="col-12 col-sm-6 col-md-5" style="padding-top:10px;">
-          <button type="submit" class="btn btn-danger float-sm-right w-100">Delete</button>
         </div>
         <!-- column end -->
       </div>
       <!-- row end -->
+              </form>
+              <!-- form end -->
     </div>
     <!-- container end -->
     <script>flatpickr("#start-time-picker", {enableTime: true});</script>

@@ -206,6 +206,21 @@ func updateEvent(db *sql.DB, event *Event) error {
 	return nil
 }
 
+func addEventDB(db *sql.DB, event *Event) error {
+	dbLog(fmt.Sprintf("mysql.go: addEvent() event: %v", event))
+	// Prepare delete stmt.
+	addDBEvent, err := db.Prepare("INSERT INTO events (name, starttime, endtime, description, userid) VALUES (?, ?, ?, ?, ?)")
+	dbLog("mysql.go: addEvent(): db.Prepare(): complete")
+	// Insert demo event into db.
+	dbLog(fmt.Sprintf("mysql.go: addEvent(): userID: %v", event.UserID))
+	results, err := addDBEvent.Exec(event.Name, event.StartTime, event.EndTime, event.Description, event.UserID)
+	if err != nil {
+		return fmt.Errorf("mysql.go: addEvent(): problem adding event: error: %v, userID: %v", err, event.UserID)
+	}
+	dbLog(fmt.Sprintf("mysql.go: addEvent(): success: results: %v", results))
+	return nil
+}
+
 func deleteEvent(db *sql.DB, id, userID int64) error {
 	dbLog(fmt.Sprintf("mysql.go: deleteEvent() id: %v, userID: %v", id, userID))
 	// Prepare delete stmt.

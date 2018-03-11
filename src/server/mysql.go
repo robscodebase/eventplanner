@@ -129,12 +129,12 @@ func createDemoDB(db *sql.DB) {
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var results: %v", results))
 }
 
-// rowScanner is implemented by sql.Row and sql.Rows
+// rowScanner() is implemented by sql.Row and sql.Rows
 type eventScanner interface {
 	Scan(scanTo ...interface{}) error
 }
 
-// scanEvents reads an event from a sql.Row or sql.Rows
+// scanEvent() reads an event from a sql.Row or sql.Rows
 func scanEvent(eventScan eventScanner) (*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: scanEvent(): eventScan: %v", eventScan))
 	var (
@@ -160,6 +160,7 @@ func scanEvent(eventScan eventScanner) (*Event, error) {
 	return event, nil
 }
 
+// listEvents() returns all events created by the current user.
 func listEvents(db *sql.DB, username string) ([]*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: listEvents(): username: %v", username))
 	rows, err := db.Query("SELECT * FROM events WHERE userid = ?", 1)
@@ -184,6 +185,7 @@ func listEvents(db *sql.DB, username string) ([]*Event, error) {
 	return events, nil
 }
 
+// listEvent() returns one event created by the current user.
 func listEvent(db *sql.DB, userID, eventID int64) (*Event, error) {
 	dbLog(fmt.Sprintf("mysql.go: listEvent() eventID: %v", eventID))
 	event, err := scanEvent(db.QueryRow("SELECT * FROM events WHERE id = ? AND userid = ?", eventID, userID))
@@ -193,6 +195,7 @@ func listEvent(db *sql.DB, userID, eventID int64) (*Event, error) {
 	return event, nil
 }
 
+// updateEvent() updates an event based on a userid and eventid.
 func updateEvent(db *sql.DB, event *Event) error {
 	dbLog(fmt.Sprintf("mysql.go: updateEvent() eventID: %v", event.ID))
 	// Prepare insert stmt.
@@ -209,6 +212,7 @@ func updateEvent(db *sql.DB, event *Event) error {
 	return nil
 }
 
+// addEventDB() adds a new event to the db.
 func addEventDB(db *sql.DB, event *Event) error {
 	dbLog(fmt.Sprintf("mysql.go: addEvent() event: %v", event))
 	// Prepare delete stmt.
@@ -224,6 +228,7 @@ func addEventDB(db *sql.DB, event *Event) error {
 	return nil
 }
 
+// deleteEvete() deletes an event based on an eventid and userid.
 func deleteEvent(db *sql.DB, id, userID int64) error {
 	dbLog(fmt.Sprintf("mysql.go: deleteEvent() id: %v, userID: %v", id, userID))
 	// Prepare delete stmt.

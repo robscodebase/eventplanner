@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Robert Reyna. All rights reserved.
+// License BSD 3-Clause https://github.com/robscodebase/eventplanner/blob/master/LICENSE.md
 // types.go contains most of the structs and types encountered in the program including Event, User, and Page data.
 package main
 

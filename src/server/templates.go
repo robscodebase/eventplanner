@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Robert Reyna. All rights reserved.
+// License BSD 3-Clause https://github.com/robscodebase/eventplanner/blob/master/LICENSE.md
 // templates.go contains functions which read html templates
 // from the templates folder, return the template to main,
 // and populate data using template variables.

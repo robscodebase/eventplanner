@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Robert Reyna. All rights reserved.
+// License BSD 3-Clause https://github.com/robscodebase/eventplanner/blob/master/LICENSE.md
 // mysql.go contains the functions for interacting with the database.
 package main
 

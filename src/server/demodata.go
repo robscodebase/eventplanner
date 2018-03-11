@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Robert Reyna. All rights reserved.
+// License BSD 3-Clause https://github.com/robscodebase/eventplanner/blob/master/LICENSE.md
 // demodata.go contains the data for populating the db on startup.
 package main
 

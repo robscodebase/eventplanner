@@ -1,3 +1,5 @@
+// Copyright (c) 2018 Robert Reyna. All rights reserved.
+// License BSD 3-Clause https://github.com/robscodebase/eventplanner/blob/master/LICENSE.md
 // logger.go contains variables and functions for turning logging on and off for certain
 // actions.  Currently, server and db log control logging for respective functions.
 package main

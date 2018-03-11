@@ -12,7 +12,10 @@ import (
 	"net/http"
 )
 
-var filePath = "/go/src/eventplanner/src/server"
+// Set localfilePath for running tests during development.
+var localfilePath = "/home/robert/gocode/src/robert/eventplanner/src/server"
+var dockerfilePath = "/go/src/eventplanner/src/server"
+var filePath = localfilePath
 
 type eventPlannerTemplate struct {
 	eventPlannerTemplate *template.Template

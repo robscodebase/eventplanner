@@ -22,6 +22,7 @@ import (
 var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
 var db *sql.DB
 
+func add2(x, y int) int { return x + y }
 func main() {
 	// Register the db and create db and tables.
 	// dbMaker runs on a loop every ten seconds
@@ -123,7 +124,10 @@ func runHandlers() http.Handler {
 	r.Methods("POST").Path("/login").
 		Handler(errorCheck(loginHandler))
 
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/go/src/eventplanner/src/server/templates")))
+	// set different server path for development testing.
+	//dockerFileServerPath := "/go/src/eventplanner/src/server/templates"
+	localFileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(localFileServerPath)))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 

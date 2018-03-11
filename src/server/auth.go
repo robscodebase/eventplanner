@@ -91,6 +91,7 @@ func registerUser(db *sql.DB, w http.ResponseWriter, r *http.Request) (string, *
 // storeSession() takes a cookie value and stores it to the user database.
 func storeSession(db *sql.DB, user *User, status string) error {
 	sLog(fmt.Sprintf("auth.go: storeSession(): user: %v", user))
+	var err error
 	// After creating the cookie session data
 	// the requested password is encrypted using bcrypt.
 	user.Secret, err = bcrypt.GenerateFromPassword(user.Secret, bcrypt.DefaultCost)

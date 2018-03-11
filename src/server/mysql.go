@@ -33,6 +33,7 @@ var createDBstmt = []string{
 
 // registerDB() opens the db and returns the db instance.
 func registerDB() (*sql.DB, error) {
+	var err error
 	dbLog(fmt.Sprintf("mysql.go: registerDB()"))
 	// retries give time for docker-compose and mysql to finish setup.
 	db, err = sql.Open("mysql", dbLogIn)

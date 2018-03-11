@@ -13,8 +13,6 @@ import (
 	"time"
 )
 
-var Login bool
-var err error
 var filePathBase string
 var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
 
@@ -36,6 +34,7 @@ func main() {
 }
 
 func dbMaker(db *sql.DB, funcName, message string) {
+	var err error
 	for retries := 0; retries < 70; retries++ {
 		if funcName == "" {
 			log.Fatal("no function specified: must use registerDB or isDB:")
@@ -219,6 +218,7 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 // addEventHandler() serves the HTML page for add-event.html.
 func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  addEventHandler()")
+	var err error
 	var user *User
 	user, err = verifySession(db, r)
 	if err != nil {
@@ -249,6 +249,7 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 // editEventHandler() serves the HTML page for edit-event.html.
 func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  editEventHandler()")
+	var err error
 	var user *User
 	// Check for an existing session.
 	user, err = verifySession(db, r)
@@ -277,6 +278,7 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  updateEventHandler():")
+	var err error
 	var user *User
 	// Check for an existing session.
 	user, err = verifySession(db, r)
@@ -311,6 +313,7 @@ func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 
 func deleteEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  deleteEventHandler():")
+	var err error
 	var user *User
 	// Check for an existing session.
 	user, err = verifySession(db, r)

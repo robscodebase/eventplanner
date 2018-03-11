@@ -1,3 +1,6 @@
+// Copyright (c) 2018 Robert Reyna. All rights reserved.
+// License BSD 3-Clause https://github.com/robscodebase/eventplanner/blob/master/LICENSE.md
+
 package main
 
 import (
@@ -13,26 +16,33 @@ import (
 	"time"
 )
 
-var filePathBase string
+// dbLogin contains the credentials and connection data
+// for the mysql db.
+// db is the global db variable.
 var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
-
 var db *sql.DB
 
 func main() {
-	// Register credentials for database with registerDB().
-	// For loop tries every 10 seconds 6 times before failure.
-	// Check if the database exists isDB().
+	// Register the db and create db and tables.
+	// dbMaker runs on a loop every ten seconds
+	// up to 70 times waiting for docker-compose
+	// and mysql to finish setup.
 	dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
 	dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
 
 	// Create demo database entries.
 	createDemoDB(db)
 
-	// Activate routing handlers with runHandlers()
+	// Activate routing handlers and serve http.
 	log.Print("Listening on port 8081")
 	log.Print(http.ListenAndServe(":8081", runHandlers()))
 }
 
+// dbMaker() takes a funcName either registerDB() or isDB()
+// both of which are responsible for creating the user
+// creditials, db and tables. To allow time for docker-compose
+// and mysql to setup dbMaker() uses loops every ten seconds
+// up to 70 times.
 func dbMaker(db *sql.DB, funcName, message string) {
 	var err error
 	for retries := 0; retries < 70; retries++ {
@@ -97,6 +107,7 @@ func runHandlers() http.Handler {
 	r.Methods("GET").Path("/delete-event/{id:[0-9]+}").
 		Handler(errorCheck(deleteEventHandler))
 
+	// Post Methods
 	r.Methods("POST").Path("/add-event").
 		Handler(errorCheck(addEventHandler))
 
@@ -276,6 +287,7 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	return editEvent.runTemplate(w, r, p)
 }
 
+// updateEventHandler() updates an event if the userid and eventid match the db.
 func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  updateEventHandler():")
 	var err error
@@ -311,6 +323,7 @@ func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	return nil
 }
 
+// deleteEventHandler() deletes an event if the userid and eventid matches.
 func deleteEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  deleteEventHandler():")
 	var err error
@@ -338,8 +351,7 @@ func deleteEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	return nil
 }
 
-// logoutHandler sets the cookie to die immediately and
-// clears memory of all username and session data.
+// logoutHandler() sets the cookie to die immediately.
 func logoutHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	cookie := &http.Cookie{
 		Name:   "golang-event-planner",
@@ -350,7 +362,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	return nil
 }
 
-// ServeHTTP ensures there are no errors before serving the HTML data.
+// ServeHTTP() ensures there are no errors before serving the HTML data.
 func (errCheck errorCheck) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if errcheck := errCheck(w, r); errcheck != nil {
 		log.Printf("main.go: ServeHTTP(): error: status code: %d, message: %s, error: %#v",

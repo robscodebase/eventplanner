@@ -3,13 +3,20 @@
 package main
 
 import (
+	"fmt"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 )
 
-func TestAdd2(t *testing.T) {
-	replyFromAdd2 := add2(2, 2)
-	if replyFromAdd2 != 4 {
-		log.Fatalf("main_test.go: TestAdd2(): replyFromAdd2 call to add(2,2) fail: want 4; got %v", replyFromAdd2)
+func TestRunHandlers(t *testing.T) {
+	srv := httptest.NewServer(runHandlers())
+	defer srv.Close()
+
+	res, err := http.Get(fmt.Sprintf("%s/login", srv.URL))
+	if err != nil {
+		log.Fatalf("main_test.go: TestRunHandlers(): http.Get() error: %v", err)
 	}
+
 }

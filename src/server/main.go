@@ -22,7 +22,6 @@ import (
 var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
 var db *sql.DB
 
-func add2(x, y int) int { return x + y }
 func main() {
 	// Register the db and create db and tables.
 	// dbMaker runs on a loop every ten seconds

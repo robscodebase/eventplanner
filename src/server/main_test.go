@@ -15,8 +15,17 @@ import (
 func TestRunHandlers(t *testing.T) {
 	server := httptest.NewServer(runHandlers())
 	defer server.Close()
-	_ = testGetHTTP(server, "login")
+	response := testGetHTTP(server, "login")
+}
 
+// testReadBody() takes a response a returns
+// the body in string format.
+func testReadBody(response *http.Response) string {
+	body, err := ioutil.ReadAll(response.Body)
+	if err != nil {
+		log.Println("main_test.go: testReadBody(): ioutil.ReadAll: error: %v", err)
+	}
+	return body
 }
 
 // testGetHTTP() takes a server and a url name

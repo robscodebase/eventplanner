@@ -12,7 +12,6 @@ import (
 // in docker logs.
 var serverLogToggle = false
 var dbLogToggle = false
-var tLogToggle = true
 
 // sLog() controls the logging mechanism for functions that rely on the server.
 func sLog(s string) {
@@ -25,12 +24,5 @@ func sLog(s string) {
 func dbLog(s string) {
 	if dbLogToggle == true {
 		log.Println("database log: ", s)
-	}
-}
-
-// tLog() controls the logging mechanism for functions that rely on tests.
-func tLog(s string) {
-	if dbLogToggle == true {
-		log.Println("test log: ", s)
 	}
 }

@@ -124,9 +124,9 @@ func runHandlers() http.Handler {
 		Handler(errorCheck(loginHandler))
 
 	// set different server path for development testing.
-	//dockerFileServerPath := "/go/src/eventplanner/src/server/templates"
-	localFileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir(localFileServerPath)))
+	dockerFileServerPath := "/go/src/eventplanner/src/server/templates"
+	//localFileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(dockerFileServerPath)))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 

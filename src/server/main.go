@@ -24,44 +24,38 @@ func main() {
 	// Register credentials for database with registerDB().
 	// For loop tries every 10 seconds 6 times before failure.
 	// Check if the database exists isDB().
-	for retries := 0; retries < 70; retries++ {
-		db, err = registerDB()
-		if err != nil {
-			dbLog(fmt.Sprintf("main.go: call to registerDB(): waiting for db to be ready: retry: %v", retries))
-			time.Sleep(time.Second * 10)
-			if retries > 69 {
-				log.Panicf("main.go: call to registerDB(): could not open db: db: %v: err: %v", db, err)
-			}
-			sLog(fmt.Sprintf("main.go: main(): registerDB(): db: %v", db))
-		} else {
-			dbLog(fmt.Sprintf("main.go: call to registerDB(): success: no of retries: %v", retries))
-			retries = 71
-		}
-
-	}
-
-	// For loop tries every 10 seconds 6 times before failure.
-	// Check if the database exists isDB().
-	for retries := 0; retries < 70; retries++ {
-		err = isDB(db)
-		if err != nil {
-			dbLog(fmt.Sprintf("main.go: call to isDB(): waiting for db to be ready: retry: %v", retries))
-			time.Sleep(time.Second * 10)
-			if retries > 69 {
-				log.Panicf("main.go: call to isDB(): could not open db: db: %v: err: %v", db, err)
-			}
-		} else {
-			dbLog(fmt.Sprintf("main.go: call to isDB(): success: no of retries: %v", retries))
-			retries = 71
-		}
-
-	}
+	dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
+	dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
 
 	// Create demo database entries.
 	createDemoDB(db)
 
 	// Activate routing handlers with runHandlers()
-	runHandlers()
+	log.Print("Listening on port 8081")
+	log.Print(http.ListenAndServe(":8081", runHandlers()))
+}
+
+func dbMaker(db *sql.DB, funcName, message string) {
+	for retries := 0; retries < 70; retries++ {
+		if funcName == "" {
+			log.Fatal("no function specified: must use registerDB or isDB:")
+		} else if funcName == "registerDB" {
+			db, err = registerDB()
+		} else {
+			err = isDB(db)
+		}
+		if err != nil {
+			dbLog(fmt.Sprintf("%v: waiting for db to be ready: retry: %v", funcName, retries))
+			time.Sleep(time.Second * 10)
+			if retries > 69 {
+				log.Panicf("%v: could not open db: db: %v: err: %v", funcName, db, err)
+			}
+			sLog(fmt.Sprintf("%v: db: %v", funcName, db))
+		} else {
+			dbLog(fmt.Sprintf("%v: success: no of retries: %v", funcName, retries))
+			retries = 71
+		}
+	}
 }
 
 // Template page variables viewEvents, addEvent, editEvent
@@ -77,7 +71,7 @@ var (
 
 // runHandlers() activates routing handlers for each page
 // and actions completed on each page and form.
-func runHandlers() {
+func runHandlers() http.Handler {
 	sLog("main.go: main(): runHandlers(): running handlers.")
 	r := mux.NewRouter()
 	r.Handle("/", http.RedirectHandler("/login", http.StatusFound))
@@ -122,8 +116,8 @@ func runHandlers() {
 	r.PathPrefix("/").Handler(http.FileServer(http.Dir("/go/src/eventplanner/src/server/templates")))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
-	log.Print("Listening on port 8081")
-	log.Print(http.ListenAndServe(":8081", r))
+
+	return r
 }
 
 // loginHandler() serves the HTML page for login.html.

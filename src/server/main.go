@@ -149,6 +149,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog(fmt.Sprintf("main.go: loginHandler(): after verifySession() user should be nil: %v", user))
 
 	if r.Method == "POST" {
+		fmt.Println("THIS IS THE REQUEST: ", r)
 		if r.FormValue("username") == "" || r.FormValue("password") == "" {
 			p := &PageData{Message: "username or password cannot be blank."}
 			return login.runTemplate(w, r, p)

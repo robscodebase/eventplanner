@@ -34,9 +34,8 @@ func main() {
 	createDemoDB(db)
 
 	// Activate routing handlers and serve http.
-	sLog("Listening on port 8081")
-	serveData := http.ListenAndServe(":8081", runHandlers())
-	sLog(fmt.Sprintf("%v", serveData))
+	log.Println("Listening on port 8081")
+	log.Fatal(http.ListenAndServe(":8081", runHandlers()))
 }
 
 // dbMaker() takes a funcName either registerDB() or isDB()

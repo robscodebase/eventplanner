@@ -18,14 +18,35 @@ var testDB *sql.DB
 
 func TestDBMaker(t *testing.T) {
 	var err error
-	testDB, err = sql.Open("mysql", "root:insecure@(mysql-event-planner:3306)/mysql")
+	testDB, err = sql.Open("mysql", "root:insecure@(172.17.0.2:3306)/mysql")
 	if err != nil {
 		t.Fatalf("main_test.go: TestDBMaker(): sql.Open(): error: %v", err)
 	}
-	err = isDB(testDB)
+	testDB, err = dbMaker(testDB, "isDB", "main_test.go: TestDBMaker(): call to dbMaker(): isDB():")
 	if err != nil {
-		t.Fatalf("main_test.go: TestDBMaker(): isDB(): unable to verify and create db: error: %v", err)
+		t.Fatalf("main_test.go: TestDBMaker(): dbMaker(): could not make db: err: %v", err)
 	}
+
+}
+
+func TestCreateDemoDB(t *testing.T) {
+	createdEvents, user, err := createDemoDB(testDB)
+	if err != nil {
+		t.Fatalf("main_test.go: TestCreateDemoDB(): err: createDemoDB(): error: %v", err)
+	}
+	if user == "" {
+		t.Fatalf("main_test.go: TestCreateDemoDB(): user: createDemoDB(): user should be demo: user: %v", user)
+	}
+	if createdEvents == 0 {
+		t.Fatalf("main_test.go: TestCreateDemoDB(): createdEvents: createDemoDB(): createdEvents: %v", createdEvents)
+	}
+
+}
+
+func TestLogin(t *testing.T) {
+	var server = httptest.NewServer(runHandlers())
+	defer server.Close()
+	response := testPostHTTP(server, "login/username=demo")
 }
 
 // funcTestRunHandlers checks that the handler is
@@ -71,6 +92,16 @@ func testGetHTTP(server *httptest.Server, request string) *http.Response {
 	response, err := http.Get(fmt.Sprintf("%s/%s", server.URL, request))
 	if err != nil {
 		log.Fatalf("main_test.go: TestGetHTTP(): http.Get() error: %v", err)
+	}
+	return response
+}
+
+// testPostHTTP() takes a server and url
+// and returns an *http.Response.
+func testPostHTTP(server *httptest.Server, request string) *http.Response {
+	response, err := http.Post(fmt.Sprintf("%s/%s", server.URL, request))
+	if err != nil {
+		log.Fatalf("main_test.go: TestPostHTTP(): http.Post() error: %v", err)
 	}
 	return response
 }

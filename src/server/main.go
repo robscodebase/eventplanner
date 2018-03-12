@@ -27,16 +27,30 @@ func main() {
 	// dbMaker runs on a loop every ten seconds
 	// up to 70 times waiting for docker-compose
 	// and mysql to finish setup.
-	db = dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
-	db = dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
-
+	var err error
+	db, err = dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
+	if err != nil {
+		log.Fatalf("main.go: main(): dbMaker(): registerDB(): err: %v", err)
+	}
+	db, err = dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
+	if err != nil {
+		log.Fatalf("main.go: main(): isDB(): registerDB(): err: %v", err)
+	}
 	// Create demo database entries.
-	createDemoDB(db)
+	createdEvents, user, err := createDemoDB(db)
+	if err != nil {
+		log.Fatalf("main.go: main(): err: createDemoDB(): error: %v", err)
+	}
+	if user == "" {
+		log.Fatalf("main.go: main(): user: createDemoDB(): user should be demo: user: %v", user)
+	}
+	if createdEvents == 0 {
+		log.Fatalf("main.go: main(): createdEvents: createDemoDB(): createdEvents: %v", createdEvents)
+	}
 
 	// Activate routing handlers and serve http.
-	sLog("Listening on port 8081")
-	serveData := http.ListenAndServe(":8081", runHandlers())
-	sLog(fmt.Sprintf("%v", serveData))
+	log.Println("Listening on port 8081")
+	log.Fatal(http.ListenAndServe(":8081", runHandlers()))
 }
 
 // dbMaker() takes a funcName either registerDB() or isDB()
@@ -44,29 +58,29 @@ func main() {
 // creditials, db and tables. To allow time for docker-compose
 // and mysql to setup dbMaker() uses loops every ten seconds
 // up to 70 times.
-func dbMaker(db *sql.DB, funcName, message string) *sql.DB {
+func dbMaker(db *sql.DB, funcName, message string) (*sql.DB, error) {
 	var err error
 	for retries := 0; retries < 70; retries++ {
 		if funcName == "" {
-			log.Fatal("no function specified: must use registerDB or isDB:")
+			log.Fatal("main.go: dbMaker(): no function specified: must use registerDB or isDB:")
 		} else if funcName == "registerDB" {
 			db, err = registerDB()
 		} else {
 			err = isDB(db)
 		}
 		if err != nil {
-			dbLog(fmt.Sprintf("%v: waiting for db to be ready: retry: %v", funcName, retries))
+			dbLog(fmt.Sprintf("%v: dbMaker() waiting for db to be ready: retry: %v", funcName, retries))
 			time.Sleep(time.Second * 10)
 			if retries > 69 {
-				log.Panicf("%v: could not open db: db: %v: err: %v", funcName, db, err)
+				return db, fmt.Errorf("%v: dbMaker() could not open db: db: %v: err: %v", funcName, db, err)
 			}
 			sLog(fmt.Sprintf("%v: db: %v", funcName, db))
 		} else {
-			dbLog(fmt.Sprintf("%v: success: no of retries: %v", funcName, retries))
+			dbLog(fmt.Sprintf("%v: dbMaker() success: no of retries: %v", funcName, retries))
 			retries = 71
 		}
 	}
-	return db
+	return db, nil
 }
 
 // Template page variables viewEvents, addEvent, editEvent
@@ -126,9 +140,9 @@ func runHandlers() http.Handler {
 		Handler(errorCheck(loginHandler))
 
 	// set different server path for development testing.
-	dockerFileServerPath := "/go/src/eventplanner/src/server/templates"
-	//localFileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir(dockerFileServerPath)))
+	FileServerPath := "/go/src/eventplanner/src/server/templates"
+	//FileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(FileServerPath)))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 

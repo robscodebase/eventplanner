@@ -13,9 +13,8 @@ import (
 )
 
 // Set localfilePath for running tests during development.
-var localfilePath = "/home/robert/gocode/src/robert/eventplanner/src/server"
-var dockerfilePath = "/go/src/eventplanner/src/server"
-var filePath = dockerfilePath
+//var filePath = "/home/robert/gocode/src/robert/eventplanner/src/server"
+var filePath = "/go/src/eventplanner/src/server"
 
 type eventPlannerTemplate struct {
 	eventPlannerTemplate *template.Template

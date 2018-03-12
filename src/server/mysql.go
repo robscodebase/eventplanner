@@ -49,13 +49,6 @@ func registerDB() (*sql.DB, error) {
 // isDB() pings, and checks that the db and table have been created.
 func isDB(db *sql.DB) error {
 	dbLog(fmt.Sprintf("mysql.go: isDB()"))
-	dbLog(fmt.Sprintf("mysql.go: isDB(): open db"))
-	//db, err := sql.Open("mysql", dbLogIn)
-	//if err != nil {
-	//return fmt.Errorf("mysql.go: isDB(): sql.Open db: %v: error: %v", db, err)
-	//}
-	//defer db.Close()
-
 	// Ping the db with db.Ping().
 	dbLog(fmt.Sprintf("mysql.go: isDB(): ping db"))
 	if db.Ping() == driver.ErrBadConn {

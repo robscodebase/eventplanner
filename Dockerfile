@@ -7,9 +7,9 @@ RUN go get github.com/gorilla/mux && \
     go get golang.org/x/crypto/bcrypt && \
     go get github.com/nu7hatch/gouuid
 
-COPY . /go/src/eventplanner
-WORKDIR /go/src/eventplanner/src/server
-RUN ["./gotest.sh"]
+#COPY . /go/src/eventplanner
+#WORKDIR /go/src/eventplanner/src/server
+#RUN ["./gotest.sh"]
 COPY . /go/src/eventplanner
 WORKDIR /go/src/eventplanner
 RUN ["./build.sh"]

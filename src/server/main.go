@@ -27,15 +27,16 @@ func main() {
 	// dbMaker runs on a loop every ten seconds
 	// up to 70 times waiting for docker-compose
 	// and mysql to finish setup.
-	dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
-	dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
+	db = dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
+	db = dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
 
 	// Create demo database entries.
 	createDemoDB(db)
 
 	// Activate routing handlers and serve http.
-	log.Print("Listening on port 8081")
-	log.Print(http.ListenAndServe(":8081", runHandlers()))
+	sLog("Listening on port 8081")
+	serveData := http.ListenAndServe(":8081", runHandlers())
+	sLog(fmt.Sprintf("%v", serveData))
 }
 
 // dbMaker() takes a funcName either registerDB() or isDB()
@@ -43,7 +44,7 @@ func main() {
 // creditials, db and tables. To allow time for docker-compose
 // and mysql to setup dbMaker() uses loops every ten seconds
 // up to 70 times.
-func dbMaker(db *sql.DB, funcName, message string) {
+func dbMaker(db *sql.DB, funcName, message string) *sql.DB {
 	var err error
 	for retries := 0; retries < 70; retries++ {
 		if funcName == "" {
@@ -65,6 +66,7 @@ func dbMaker(db *sql.DB, funcName, message string) {
 			retries = 71
 		}
 	}
+	return db
 }
 
 // Template page variables viewEvents, addEvent, editEvent
@@ -213,7 +215,7 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	// Check for an existing session.
 	user, err = verifySession(db, r)
 	if err != nil {
-		log.Printf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err)
+		sLog(fmt.Sprintf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
 		return nil
 	}
@@ -222,8 +224,8 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 		p := &PageData{PageName: "View Events", Message: fmt.Sprintf("No Events to view: %v", err)}
 		return viewEvents.runTemplate(w, r, p)
 	}
-	log.Printf("main.go: viewEventsHandler(): events from listEvents: %v", events)
-	log.Printf("main.go: viewEventsHandler(): user: %v", user)
+	sLog(fmt.Sprintf("main.go: viewEventsHandler(): events from listEvents: %v", events))
+	sLog(fmt.Sprintf("main.go: viewEventsHandler(): user: %v", user))
 	p := &PageData{Events: events, PageName: "View Events"}
 	sLog("main.go: main():  viewEventsHandler() call to handler.")
 	return viewEvents.runTemplate(w, r, p)
@@ -368,8 +370,7 @@ func logoutHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 // ServeHTTP() ensures there are no errors before serving the HTML data.
 func (errCheck errorCheck) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	if errcheck := errCheck(w, r); errcheck != nil {
-		log.Printf("main.go: ServeHTTP(): error: status code: %d, message: %s, error: %#v",
-			errcheck.Code, errcheck.Message, errcheck.Error)
+		sLog(fmt.Sprintf("main.go: ServeHTTP(): error: status code: %d, message: %s, error: %#v", errcheck.Code, errcheck.Message, errcheck.Error))
 		http.Error(w, errcheck.Message, errcheck.Code)
 	}
 }

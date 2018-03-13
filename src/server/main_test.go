@@ -50,7 +50,7 @@ func TestCreateDemoDB(t *testing.T) {
 }
 
 // funcTestRunHandlers checks that the handler is
-// operational. It does not check for accuracy.
+// operational. It checks if the title matches.
 func TestRunHandlers(t *testing.T) {
 	var server = httptest.NewServer(runHandlers())
 	defer server.Close()

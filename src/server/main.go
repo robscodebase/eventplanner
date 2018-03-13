@@ -21,6 +21,7 @@ import (
 // db is the global db variable.
 var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
 var db *sql.DB
+var testingSession bool
 
 func main() {
 	// Register the db and create db and tables.
@@ -156,10 +157,15 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var message string
 	var err error
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if user != nil {
 		sLog(fmt.Sprintf("main.go: loginHandler(): verifySession(): user exists redirecting to view-events: user: %v", user))
 		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
 	}
 	sLog(fmt.Sprintf("main.go: loginHandler(): after verifySession() user should be nil: %v", user))
 
@@ -179,6 +185,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 		}
 		sLog(fmt.Sprintf("main.go: loginHandler(): message: %v, user: %v", message, user))
 		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
 	}
 	p := &PageData{Message: "Enter your username."}
 	return login.runTemplate(w, r, p)
@@ -227,7 +234,11 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var events []*Event
 	var err error
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -250,7 +261,11 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  addEventHandler()")
 	var err error
 	var user *User
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
@@ -282,7 +297,19 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var err error
 	var user *User
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+		event, err := listEvent(db, 1, 1)
+		if err != nil {
+			sLog(fmt.Sprintf("main.go: editEventHandler(): call to listEvent(): error: %v: redirecting to view-events page:", err))
+			http.Redirect(w, r, "/view-events", http.StatusFound)
+			return nil
+		}
+		p := &PageData{PageName: "Edit Event", Event: event}
+		return editEvent.runTemplate(w, r, p)
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: editEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -312,7 +339,11 @@ func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var err error
 	var user *User
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: updateEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -348,7 +379,11 @@ func deleteEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var err error
 	var user *User
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: deleteEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)

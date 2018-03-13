@@ -10,27 +10,28 @@ import (
 	"log"
 	"net/http"
 	"net/http/httptest"
+	"net/url"
 	"strings"
 	"testing"
 )
 
-var testDB *sql.DB
+var server *httptest.Server
 
 func TestDBMaker(t *testing.T) {
+	testingSession = true
 	var err error
-	testDB, err = sql.Open("mysql", "root:insecure@(172.17.0.2:3306)/mysql")
+	db, err = sql.Open("mysql", "root:insecure@(172.17.0.2:3306)/mysql")
 	if err != nil {
-		t.Fatalf("main_test.go: TestDBMaker(): sql.Open(): error: %v", err)
+		t.Fatalf("main_test.go: dbMaker(): sql.Open(): error: %v", err)
 	}
-	testDB, err = dbMaker(testDB, "isDB", "main_test.go: TestDBMaker(): call to dbMaker(): isDB():")
+	db, err = dbMaker(db, "isDB", "main_test.go: dbMaker(): call to dbMaker(): isDB():")
 	if err != nil {
-		t.Fatalf("main_test.go: TestDBMaker(): dbMaker(): could not make db: err: %v", err)
+		t.Fatalf("main_test.go: dbMaker(): dbMaker(): could not make db: err: %v", err)
 	}
-
 }
 
 func TestCreateDemoDB(t *testing.T) {
-	createdEvents, user, err := createDemoDB(testDB)
+	createdEvents, user, err := createDemoDB(db)
 	if err != nil {
 		t.Fatalf("main_test.go: TestCreateDemoDB(): err: createDemoDB(): error: %v", err)
 	}
@@ -40,13 +41,6 @@ func TestCreateDemoDB(t *testing.T) {
 	if createdEvents == 0 {
 		t.Fatalf("main_test.go: TestCreateDemoDB(): createdEvents: createDemoDB(): createdEvents: %v", createdEvents)
 	}
-
-}
-
-func TestLogin(t *testing.T) {
-	var server = httptest.NewServer(runHandlers())
-	defer server.Close()
-	response := testPostHTTP(server, "login/username=demo")
 }
 
 // funcTestRunHandlers checks that the handler is
@@ -58,12 +52,12 @@ func TestRunHandlers(t *testing.T) {
 		pageName  string
 		pageTitle string
 	}{
-	//{pageName: "login", pageTitle: "<title>Event Planner - Login</title>"},
-	//{pageName: "add-event", pageTitle: "<title>Event Planner - Add</title>"},
-	//{pageName: "edit-event/1", pageTitle: "<title>Event Planner - Edit</title>"},
-	//{pageName: "view-events", pageTitle: "<title>Event Planner - View</title>"},
-	//{pageName: "register", pageTitle: "<title>Event Planner - Register</title>"},
-	//{pageName: "logout", pageTitle: "<title>Event Planner - Logout</title>"},
+		{pageName: "login", pageTitle: "<title>Event Planner - View Events</title>"},
+		{pageName: "add-event", pageTitle: "<title>Event Planner - Add Event</title>"},
+		{pageName: "edit-event/1", pageTitle: "<title>Event Planner - Edit Event</title>"},
+		{pageName: "view-events", pageTitle: "<title>Event Planner - View Events</title>"},
+		{pageName: "register", pageTitle: "<title>Event Planner - Register</title>"},
+		{pageName: "logout", pageTitle: "<title>Event Planner - View Events</title>"},
 	}
 	for _, v := range testHandlerTable {
 		response := testGetHTTP(server, v.pageName)
@@ -71,7 +65,7 @@ func TestRunHandlers(t *testing.T) {
 		if responseString == "404 page not found" {
 			log.Printf("main_test.go: TestRunHandlers(): testGetHTTP(): pageName: %v: want; body: got; %v", v.pageName, responseString)
 		} else if strings.Contains(responseString, v.pageTitle) != true {
-			log.Printf("main_test.go: TestRunHandlers(): responseString error: want %v; got %v", v.pageTitle, responseString)
+			log.Printf("main_test.go: TestRunHandlers(): pageName: %v, responseString error: want %v; got %v", v.pageName, v.pageTitle, responseString)
 		}
 	}
 }
@@ -98,10 +92,14 @@ func testGetHTTP(server *httptest.Server, request string) *http.Response {
 
 // testPostHTTP() takes a server and url
 // and returns an *http.Response.
-func testPostHTTP(server *httptest.Server, request string) *http.Response {
-	response, err := http.Post(fmt.Sprintf("%s/%s", server.URL, request))
+func testPostHTTP(server *httptest.Server, request string, data url.Values) *http.Response {
+	response, err := http.PostForm(fmt.Sprintf("%s/%s", server.URL, request), data)
 	if err != nil {
 		log.Fatalf("main_test.go: TestPostHTTP(): http.Post() error: %v", err)
 	}
 	return response
+}
+
+func closeServer(server *http.Server) {
+	server.Close()
 }

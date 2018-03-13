@@ -1,6 +1,6 @@
 # Docker Golang Mysql Event Planner
 
-Docker Golang Mysql Event Planner is created as a demo project for the portfolio of Robert Reyna.
+Docker Golang Mysql Event Planner is created as a demo project for my portfolio.
 If you are interested in hiring me for work please email me at robscodebase@gmail.com.
 
 Unless otherwise noted, these source files are distributed under the

@@ -21,17 +21,33 @@ import (
 // db is the global db variable.
 var dbLogIn = "root:insecure@(mysql-event-planner:3306)/mysql"
 var db *sql.DB
+var testingSession bool
 
 func main() {
 	// Register the db and create db and tables.
 	// dbMaker runs on a loop every ten seconds
 	// up to 70 times waiting for docker-compose
 	// and mysql to finish setup.
-	db = dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
-	db = dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
-
+	var err error
+	db, err = dbMaker(db, "registerDB", "main.go: call to registerDB() from dbMaker():")
+	if err != nil {
+		log.Fatalf("main.go: main(): dbMaker(): registerDB(): err: %v", err)
+	}
+	db, err = dbMaker(db, "isDB", "main.go: call to isDB() from dbMaker():")
+	if err != nil {
+		log.Fatalf("main.go: main(): isDB(): registerDB(): err: %v", err)
+	}
 	// Create demo database entries.
-	createDemoDB(db)
+	createdEvents, user, err := createDemoDB(db)
+	if err != nil {
+		log.Fatalf("main.go: main(): err: createDemoDB(): error: %v", err)
+	}
+	if user == "" {
+		log.Fatalf("main.go: main(): user: createDemoDB(): user should be demo: user: %v", user)
+	}
+	if createdEvents == 0 {
+		log.Fatalf("main.go: main(): createdEvents: createDemoDB(): createdEvents: %v", createdEvents)
+	}
 
 	// Activate routing handlers and serve http.
 	log.Println("Listening on port 8081")
@@ -43,29 +59,29 @@ func main() {
 // creditials, db and tables. To allow time for docker-compose
 // and mysql to setup dbMaker() uses loops every ten seconds
 // up to 70 times.
-func dbMaker(db *sql.DB, funcName, message string) *sql.DB {
+func dbMaker(db *sql.DB, funcName, message string) (*sql.DB, error) {
 	var err error
 	for retries := 0; retries < 70; retries++ {
 		if funcName == "" {
-			log.Fatal("no function specified: must use registerDB or isDB:")
+			log.Fatal("main.go: dbMaker(): no function specified: must use registerDB or isDB:")
 		} else if funcName == "registerDB" {
 			db, err = registerDB()
 		} else {
 			err = isDB(db)
 		}
 		if err != nil {
-			dbLog(fmt.Sprintf("%v: waiting for db to be ready: retry: %v", funcName, retries))
+			dbLog(fmt.Sprintf("%v: dbMaker() waiting for db to be ready: retry: %v", funcName, retries))
 			time.Sleep(time.Second * 10)
 			if retries > 69 {
-				log.Panicf("%v: could not open db: db: %v: err: %v", funcName, db, err)
+				return db, fmt.Errorf("%v: dbMaker() could not open db: db: %v: err: %v", funcName, db, err)
 			}
 			sLog(fmt.Sprintf("%v: db: %v", funcName, db))
 		} else {
-			dbLog(fmt.Sprintf("%v: success: no of retries: %v", funcName, retries))
+			dbLog(fmt.Sprintf("%v: dbMaker() success: no of retries: %v", funcName, retries))
 			retries = 71
 		}
 	}
-	return db
+	return db, nil
 }
 
 // Template page variables viewEvents, addEvent, editEvent
@@ -125,9 +141,9 @@ func runHandlers() http.Handler {
 		Handler(errorCheck(loginHandler))
 
 	// set different server path for development testing.
-	dockerFileServerPath := "/go/src/eventplanner/src/server/templates"
-	//localFileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
-	r.PathPrefix("/").Handler(http.FileServer(http.Dir(dockerFileServerPath)))
+	FileServerPath := "/go/src/eventplanner/src/server/templates"
+	//FileServerPath := "/home/robert/gocode/src/robert/eventplanner/src/server/templates"
+	r.PathPrefix("/").Handler(http.FileServer(http.Dir(FileServerPath)))
 
 	http.Handle("/", handlers.CombinedLoggingHandler(os.Stderr, r))
 
@@ -141,15 +157,19 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var message string
 	var err error
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if user != nil {
 		sLog(fmt.Sprintf("main.go: loginHandler(): verifySession(): user exists redirecting to view-events: user: %v", user))
 		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
 	}
 	sLog(fmt.Sprintf("main.go: loginHandler(): after verifySession() user should be nil: %v", user))
 
 	if r.Method == "POST" {
-		fmt.Println("THIS IS THE REQUEST: ", r)
 		if r.FormValue("username") == "" || r.FormValue("password") == "" {
 			p := &PageData{Message: "username or password cannot be blank."}
 			return login.runTemplate(w, r, p)
@@ -165,6 +185,7 @@ func loginHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 		}
 		sLog(fmt.Sprintf("main.go: loginHandler(): message: %v, user: %v", message, user))
 		http.Redirect(w, r, "/view-events", http.StatusFound)
+		return nil
 	}
 	p := &PageData{Message: "Enter your username."}
 	return login.runTemplate(w, r, p)
@@ -213,7 +234,11 @@ func viewEventsHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var events []*Event
 	var err error
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: viewEventsHandler(): error: %v: redirecting to login page", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -236,7 +261,11 @@ func addEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	sLog("main.go: main():  addEventHandler()")
 	var err error
 	var user *User
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		http.Redirect(w, r, "/login", http.StatusFound)
 	}
@@ -268,7 +297,19 @@ func editEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var err error
 	var user *User
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+		event, err := listEvent(db, 1, 1)
+		if err != nil {
+			sLog(fmt.Sprintf("main.go: editEventHandler(): call to listEvent(): error: %v: redirecting to view-events page:", err))
+			http.Redirect(w, r, "/view-events", http.StatusFound)
+			return nil
+		}
+		p := &PageData{PageName: "Edit Event", Event: event}
+		return editEvent.runTemplate(w, r, p)
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: editEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -298,7 +339,11 @@ func updateEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var err error
 	var user *User
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: updateEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)
@@ -334,7 +379,11 @@ func deleteEventHandler(w http.ResponseWriter, r *http.Request) *errorMessage {
 	var err error
 	var user *User
 	// Check for an existing session.
-	user, err = verifySession(db, r)
+	if testingSession {
+		user = demoUser
+	} else {
+		user, err = verifySession(db, r)
+	}
 	if err != nil {
 		sLog(fmt.Sprintf("main.go: deleteEventHandler(): error: %v: redirecting to login page:", err))
 		http.Redirect(w, r, "/login", http.StatusFound)

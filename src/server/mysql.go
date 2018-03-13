@@ -88,7 +88,8 @@ func createDB(db *sql.DB) error {
 }
 
 // createDemoDB() add the demo events and user to the db.
-func createDemoDB(db *sql.DB) {
+func createDemoDB(db *sql.DB) (int, string, error) {
+	var eventsCreated int
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var db: %v", db))
 	// Range over each of the demoEvents and insert them in to the db.
 	for _, demo := range demoEvents {
@@ -99,9 +100,10 @@ func createDemoDB(db *sql.DB) {
 		results, err := insertDemoEvent.Exec(demo.Name, demo.StartTime, demo.EndTime, demo.Description, demo.UserID)
 		if err != nil {
 			dbLog(fmt.Sprintf("mysql.go: createDemoDB(): problem creating demo db most likely entries already exist: %v", err))
-			return
+			return eventsCreated, "", err
 		}
 		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): insertDemoEvent success: results: %v", results))
+		eventsCreated++
 	}
 
 	// Prepare insert stmt.
@@ -117,9 +119,10 @@ func createDemoDB(db *sql.DB) {
 	results, err := insertDemoUser.Exec(demoUser.Username, secret)
 	if err != nil {
 		dbLog(fmt.Sprintf("mysql.go: createDemoDB(): problem creating demo user most likely entries already exist: %v", err))
-		return
+		return eventsCreated, "", err
 	}
 	dbLog(fmt.Sprintf("mysql.go: createDemoDB(): var results: %v", results))
+	return eventsCreated, demoUser.Username, nil
 }
 
 // rowScanner() is implemented by sql.Row and sql.Rows

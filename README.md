@@ -38,3 +38,6 @@ You must have Docker and Docker-Compose installed on your machine.
 * `github.com/go-sql-driver/mysql`
 * `golang.org/x/crypto/bcrypt`
 * `github.com/nu7hatch/gouuid`
+* `Bootstrap4 for css and javascript`
+* `flatpickr for javascript time/date picker`
+

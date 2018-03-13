@@ -31,9 +31,9 @@ You must have Docker and Docker-Compose installed on your machine.
 * `./runtest.sh`
 * This will start a mysql instance and run tests on the server.
 
-#### Non-standard libraries.
-    * `github.com/gorilla/mux`
-    * `github.com/gorilla/handlers`
-    * `github.com/go-sql-driver/mysql`
-    * `golang.org/x/crypto/bcrypt`
-    * `github.com/nu7hatch/gouuid`
+### Non-standard libraries.
+* `github.com/gorilla/mux`
+* `github.com/gorilla/handlers`
+* `github.com/go-sql-driver/mysql`
+* `golang.org/x/crypto/bcrypt`
+* `github.com/nu7hatch/gouuid`

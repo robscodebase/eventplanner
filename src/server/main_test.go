@@ -76,7 +76,7 @@ func TestRunHandlers(t *testing.T) {
 	}
 }
 
-// testReadBody() takes a response a returns
+// testReadBody() takes a response and returns
 // the body in string format.
 func testReadBody(response *http.Response) []byte {
 	body, err := ioutil.ReadAll(response.Body)

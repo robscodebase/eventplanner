@@ -8,6 +8,9 @@ RUN go get github.com/gorilla/mux && \
     go get github.com/nu7hatch/gouuid
 
 ## UNCOMMENT TO RUN TESTS.
+## Don't use docker-compose up to run tests.
+## Use ./runtest.sh which will start the needed
+## mysql db first.
 COPY . /go/src/eventplanner
 WORKDIR /go/src/eventplanner/src/server
 RUN ["./gotest.sh"]

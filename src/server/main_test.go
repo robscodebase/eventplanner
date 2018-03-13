@@ -17,7 +17,12 @@ import (
 
 var server *httptest.Server
 
+// TestDBMaker() opens a sql connection
+// and runs dbMaker() which runs isDB(),
+// confirming the database tables are in place.
 func TestDBMaker(t *testing.T) {
+	// testingSession = true bypasses the verifySession() function
+	// to allow for testing of the handlers using the demo user data.
 	testingSession = true
 	var err error
 	db, err = sql.Open("mysql", "root:insecure@(172.17.0.2:3306)/mysql")
@@ -30,6 +35,7 @@ func TestDBMaker(t *testing.T) {
 	}
 }
 
+// TestCreateDemoDB() creates the demo database and populates it with events for testing handlers.
 func TestCreateDemoDB(t *testing.T) {
 	createdEvents, user, err := createDemoDB(db)
 	if err != nil {
@@ -100,6 +106,7 @@ func testPostHTTP(server *httptest.Server, request string, data url.Values) *htt
 	return response
 }
 
+// TestCloseServer() closes the server at the end of testing.
 func closeServer(server *http.Server) {
 	server.Close()
 }

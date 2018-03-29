@@ -41,3 +41,7 @@ You must have Docker and Docker-Compose installed on your machine.
 * `Bootstrap4 for css and javascript`
 * `flatpickr for javascript time/date picker`
 
+![Event Planner Image 1](screenshots/event-planner-view-events.png)
+![Event Planner Image 2](screenshots/event-planner-edit-event.png)
+![Event Planner Image 3](screenshots/event-planner-add-event.png)
+![Event Planner Image 4](screenshots/event-planner-login.png)

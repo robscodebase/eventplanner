@@ -39,7 +39,7 @@ func compileTemplate(templateName string) *eventPlannerTemplate {
 		return &eventPlannerTemplate{main.Lookup("main.html")}
 	}
 	if templateName == "register.html" {
-		// Head and footer are emptry for login.html.
+		// Head and footer are empty for login.html.
 		template.Must(main.New("header").Parse(string("")))
 		template.Must(main.New("body").Parse(string(body)))
 		template.Must(main.New("footer").Parse(string("")))

@@ -85,7 +85,7 @@ func dbMaker(db *sql.DB, funcName, message string) (*sql.DB, error) {
 }
 
 // Template page variables viewEvents, addEvent, editEvent
-// login and register link the html module for that pages
+// login and register link the html module for the page
 // body and returns a complete html page with header and footer.
 var (
 	viewEvents = compileTemplate("view-events.html")

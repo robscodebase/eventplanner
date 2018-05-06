@@ -72,6 +72,7 @@ func isDB(db *sql.DB) error {
 		// Unknown error.
 		return fmt.Errorf("mysql.go: isDB(): db.Exec: error: %v", err)
 	}
+	dbLog(fmt.Sprintf("mysql.go: isDB(): db is ready"))
 	return nil
 }
 

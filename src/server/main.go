@@ -70,7 +70,7 @@ func dbMaker(db *sql.DB, funcName, message string) (*sql.DB, error) {
 			err = isDB(db)
 		}
 		if err != nil {
-			dbLog(fmt.Sprintf("%v: dbMaker() waiting for db to be ready: retry: %v", funcName, retries))
+			dbLog(fmt.Sprintf("main.go: %v: dbMaker() waiting for db to be ready: retry: %v, error: %v", funcName, retries, err))
 			time.Sleep(time.Second * 10)
 			if retries > 69 {
 				return db, fmt.Errorf("%v: dbMaker() could not open db: db: %v: err: %v", funcName, db, err)
